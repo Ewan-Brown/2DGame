@@ -1,5 +1,7 @@
 package main;
 
+import entities.Entity;
+
 public class GameMath {
 	
 	public final static double SIN_OF_45 = Math.sin(Math.toRadians(45));

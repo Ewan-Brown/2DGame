@@ -15,6 +15,8 @@ import javax.swing.JPanel;
 
 import effects.Effects;
 import effects.Particle;
+import entities.Alien;
+import entities.Player;
 
 public class GamePanel extends JPanel implements KeyListener{
 
@@ -28,7 +30,7 @@ public class GamePanel extends JPanel implements KeyListener{
 	int aliens = 1;;
 	int panelWidth;
 	int panelHeight;
-	enum Direction{Left,Right,Up,Down};
+	public enum Direction{Left,Right,Up,Down};
 	Direction direction;
 	BitSet keySet = new BitSet(256);
 	double playerSpeedControl = 1;
@@ -96,16 +98,16 @@ public class GamePanel extends JPanel implements KeyListener{
 		drawAliens(g2);
 		drawEffects(g2);
 		g.setColor(Color.BLACK);
-		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-    		RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-	    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-	    		RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+//		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+//    		RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+//	    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+//	    		RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 	}
 	public void drawEffects(Graphics g){
 		for(int i = 0; i < particleArray.size();i++){
 			p = particleArray.get(i);
 			g.setColor(p.color);
-			g.drawRect((int)p.x, (int)p.y, 1, 1);
+			g.fillRect((int)p.x, (int)p.y, 1, 1);
 		}
 	}
 	public void drawPlayer(Graphics g){
@@ -141,17 +143,17 @@ public class GamePanel extends JPanel implements KeyListener{
 			if((GameMath.getDistance(player1,cAlien) < ((player1.w + 1) / 2)  + (cAlien.w + 1) / 2)){
 				if(player1.dead == false){
 					player1.onCollision();
-//					particleArray.addAll(Effects.explode(player1.x, player1.y,player1.color));
-					particleArray.addAll(Effects.fireworks(Effects.explode(player1.x, player1.y,player1.color)));
-					particleArray.addAll(Effects.swirlyParticle(player1.x, player1.y, player1.color));
+					particleArray.addAll(Effects.explode(player1.x, player1.y,player1.color));
+//					particleArray.addAll(Effects.fireworks(Effects.explode(player1.x, player1.y,player1.color)));
+					particleArray.addAll(Effects.fireworksSwirly(Effects.swirlyParticle(player1.x,player1.y, player1.color)));
 				}
 			}
 			if((GameMath.getDistance(player2,cAlien) < ((player2.w + 1) / 2) + (cAlien.w + 1) / 2)){
 				if(player2.dead == false){
 					player2.onCollision();
 					
-//					particleArray.addAll(Effects.explode(player2.x, player2.y,player2.color));
-					particleArray.addAll(Effects.fireworks(Effects.explode(player2.x, player2.y,player2.color)));
+					particleArray.addAll(Effects.explode(player2.x, player2.y,player2.color));
+//					particleArray.addAll(Effects.fireworks(Effects.explode(player2.x, player2.y,player2.color)));
 					particleArray.addAll(Effects.swirlyParticle(player2.x, player2.y, player2.color));
 				}
 			}

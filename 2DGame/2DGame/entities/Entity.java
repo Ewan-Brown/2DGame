@@ -1,21 +1,22 @@
-package main;
+package entities;
 
 import java.awt.Color;
 
+import main.GameMath;
 import main.GamePanel.Direction;
 
 public class Entity {
 
-	double x, y;
+	public double x, y;
 	int health;
-	int w = 10;
-	int h = 10;
+	public int w = 10;
+	public int h = 10;
 	int MAX_X;
 	int MAX_Y;
-	double speed;
+	public double speed;
 	double l,r,u,d;
-	boolean dead;
-	Color color;
+	public boolean dead;
+	public Color color;
 	public Entity(int width, int height, int x, int y){
 		this.x = x;
 		this.y = y;

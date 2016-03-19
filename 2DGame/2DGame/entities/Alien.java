@@ -1,7 +1,8 @@
-package main;
+package entities;
 
 import java.awt.Color;
 
+import main.GameMath;
 import main.GamePanel.Direction;
 
 public class Alien extends Entity{

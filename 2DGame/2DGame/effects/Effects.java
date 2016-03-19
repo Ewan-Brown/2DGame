@@ -26,7 +26,15 @@ public class Effects {
 		}
 		return pArray;
 	}
+	//Firework doesn't work with Particle Swirly because it returns a swirly and not a base 'particle'
 	public static ArrayList<Particle> fireworks(ArrayList<Particle> array){
+		Random rand = new Random();
+		for(int i = 0; i < array.size(); i++){
+			array.get(i).color = new Color(rand.nextInt(255),rand.nextInt(255),rand.nextInt(255));
+		}
+		return array;
+	}
+	public static ArrayList<ParticleSwirly> fireworksSwirly(ArrayList<ParticleSwirly> array){
 		Random rand = new Random();
 		for(int i = 0; i < array.size(); i++){
 			array.get(i).color = new Color(rand.nextInt(255),rand.nextInt(255),rand.nextInt(255));
