@@ -1,13 +1,11 @@
 package entities;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 import main.GameMath;
-import main.GamePanel.Direction;
 
-public class Alien extends Entity{
-	Entity target;
-	double dist, dist2;
+public class Alien extends EntityAI{
 	double angle;
 	
 	public Alien(int w, int h, int x, int y) {
@@ -15,46 +13,47 @@ public class Alien extends Entity{
 		this.color = Color.red;
 		this.speed = 0.5;
 	}
-	public void updateTarget(Player player1, Player player2){
-		dist = GameMath.getDistance(player1.x, player1.y, this.x, this.y);
-		dist2 = GameMath.getDistance(player2.x, player2.y, this.x, this.y);
-		if(player1.dead == false && player2.dead == false){
-			if(dist < dist2){
-				target = player1;
+	public void updateTarget(ArrayList<Entity> targetArray){
+		System.out.println(targetArray.size());
+		double targets = targetArray.size();
+		boolean allDead = true;
+		double dist;
+		double prevDist = 999999;
+		for(int i = 0; i < targets;i++){
+			if(targetArray.get(i).dead == false){
+				allDead = false;
+				dist = GameMath.getDistance(targetArray.get(i),this);
+				if(dist < prevDist){
+					target = targetArray.get(i);
+				}
+				prevDist = dist;
 			}
 			else{
-				target = player2;
+				target = null;
 			}
 		}
-		else if(player1.dead == true && player2.dead == false){
-			target = player2;
-		}
-		else if(player1.dead == false && player2.dead == true){
-			target = player1;
-		}
-		else{
-			target = null;
-		}
 	}
-	public void moveAlien(){
-		if(target == null){
-			return;
-		}
-		double deltaX = 0;
-		double deltaY = 0;
-		angle = 0;
-		angle = GameMath.getAngle(x, y, target.x,target.y);
-		angle = Math.toRadians(angle);
-		deltaX = 1 * Math.sin(angle);
-		deltaY = 1 * Math.cos(angle);
-		//FLIP X
-		if(target.x - x < 0){
-			deltaX = - deltaX;
-		}
-		//FLIP Y
-		if(target.y - y < 0){
-			deltaY = -deltaY;
-		}
+	public void moveAI(){
+//		if(target == null){
+//			return;
+//		}
+//		double deltaX = 0;
+//		double deltaY = 0;
+//		angle = 0;
+////		angle = GameMath.getAngle(x, y, target.x,target.y);
+//		angle = Math.atan2(target.y - y, target.x - x);
+//		deltaX = speed * Math.cos(angle);
+//		deltaY = speed * Math.sin(angle);
+//		//FLIP X
+//		if(target.x - x < 0){
+//			deltaX = - deltaX;
+//		}
+//		//FLIP Y
+//		if(target.y - y < 0){
+//			deltaY = -deltaY;
+//		}
+		super.moveAI();
+//		System.out.println(deltaX+" "+deltaY+" "+angle);
 		this.x += deltaX;
 		this.y += deltaY;
 		checkWallCollision();

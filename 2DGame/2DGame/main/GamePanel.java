@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import javax.swing.JPanel;
 import effects.Effects;
 import effects.Particle;
 import entities.Alien;
+import entities.Entity;
 import entities.Player;
 
 public class GamePanel extends JPanel implements KeyListener{
@@ -27,7 +27,7 @@ public class GamePanel extends JPanel implements KeyListener{
 	Player player1;
 	Player player2;
 	Alien cAlien;
-	int aliens = 1;;
+	int aliens = 10;
 	int panelWidth;
 	int panelHeight;
 	public enum Direction{Left,Right,Up,Down};
@@ -41,6 +41,7 @@ public class GamePanel extends JPanel implements KeyListener{
 	boolean i,j,k,l,w,a,s,d;
 	public ArrayList<Particle> particleArray = new ArrayList<Particle>();
 	public ArrayList<Alien> alienArray = new ArrayList<Alien>();
+	public ArrayList<Entity> targets = new ArrayList<Entity>();
 	Particle p;
 	Random rand;
 	public GamePanel(int w, int h){
@@ -56,11 +57,15 @@ public class GamePanel extends JPanel implements KeyListener{
 	
 	public void startGame(){
 		alienArray.clear();
+		targets.clear();
 		player1 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.GREEN);
 		player2 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.BLUE);
 		for(int i = 0; i < aliens; i++){
-			alienArray.add(new Alien(panelWidth,panelHeight,rand.nextInt(panelHeight - 4),rand.nextInt(panelWidth - 4)));
+			alienArray.add(new Alien(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
+//			alienArray.add(new Target(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));   
 		}
+		targets.add(player1);
+		targets.add(player2);
 	}
 
 	public void update(){
@@ -132,8 +137,8 @@ public class GamePanel extends JPanel implements KeyListener{
 	public void moveAlien(){
 		for(int i = 0; i < alienArray.size(); i ++){
 			cAlien = alienArray.get(i);
-			cAlien.updateTarget(player1, player2);
-			cAlien.moveAlien();
+			cAlien.updateTarget(targets);
+			cAlien.moveAI();
 		}
 	}
 	public void checkCollisions(){

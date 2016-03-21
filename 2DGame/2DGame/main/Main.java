@@ -1,14 +1,15 @@
 package main;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
 public class Main{
 	GamePanel panel;
 	JFrame frame;
-	public static int w = 1920;
-	public static int h = 1080;
+	public static int w = 400;
+	public static int h = 400;
 	int speed = 1;
 	Dimension preferredSize;
 	public static void main(String[] args){

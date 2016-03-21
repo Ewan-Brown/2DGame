@@ -14,10 +14,10 @@ public class GameMath {
 	}
 	public static double getAngle(double x1, double y1, double x2, double y2){
 		double angle = 0;
-		double x = Math.abs(x1 - x2);
-		double y = Math.abs(y1 - y2);
+		double x = x1 - x2;
+		double y = y1 - y2;
 		angle = Math.atan2(x, y);
-		return Math.toDegrees(angle);
+		return angle;
 	}
 	
 }
