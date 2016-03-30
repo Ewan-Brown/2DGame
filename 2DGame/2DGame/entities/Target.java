@@ -1,7 +1,5 @@
 package entities;
 
-import main.GameMath;
-
 public class Target extends Alien{
 	boolean sX,sY;
 	public Target(int width, int height, int x, int y) {

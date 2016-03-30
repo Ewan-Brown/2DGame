@@ -2,8 +2,6 @@ package effects;
 
 import java.awt.Color;
 
-import main.Main;
-
 public class Particle {
 	
 	public Color color;

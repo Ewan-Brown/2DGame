@@ -6,6 +6,7 @@ public class Player extends Entity{
 	public boolean sprint;
 	public Player(int width, int height,int x, int y,Color c) {
 		super(width,height,x,y);
+		name = "PLAYER";
 		this.color = c;
 	}
 	public void moveEntity(double x, double y){

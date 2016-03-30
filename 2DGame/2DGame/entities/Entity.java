@@ -3,10 +3,10 @@ package entities;
 import java.awt.Color;
 
 import main.GameMath;
-import main.GamePanel.Direction;
 
 public class Entity {
 
+	public String name;
 	public double x, y;
 	int health;
 	public int w = 10;
@@ -18,6 +18,7 @@ public class Entity {
 	public boolean dead;
 	public Color color;
 	public Entity(int width, int height, int x, int y){
+		name = "NULL";
 		this.x = x;
 		this.y = y;
 		this.health = 100;

@@ -27,7 +27,7 @@ public class GamePanel extends JPanel implements KeyListener{
 	Player player1;
 	Player player2;
 	Alien cAlien;
-	int aliens = 10;
+	int aliens = 1;
 	int panelWidth;
 	int panelHeight;
 	public enum Direction{Left,Right,Up,Down};

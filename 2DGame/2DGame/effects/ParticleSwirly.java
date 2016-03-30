@@ -1,7 +1,6 @@
 package effects;
 
 import java.awt.Color;
-import java.util.Random;
 
 public class ParticleSwirly extends Particle{
 	//go in a direction for 2-3 pixels then randomly change using RAND

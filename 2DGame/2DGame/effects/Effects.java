@@ -26,7 +26,7 @@ public class Effects {
 		}
 		return pArray;
 	}
-	//Firework doesn't work with Particle Swirly because it returns a swirly and not a base 'particle'
+	//XXX Firework doesn't work with Particle Swirly because it returns a swirly and not a base 'particle'
 	public static ArrayList<Particle> fireworks(ArrayList<Particle> array){
 		Random rand = new Random();
 		for(int i = 0; i < array.size(); i++){
