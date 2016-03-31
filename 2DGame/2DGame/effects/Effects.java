@@ -41,8 +41,19 @@ public class Effects {
 		}
 		return array;
 	}
+	public static ArrayList<ParticleImplode> implode(double x, double y, Color c){
+		int pNum = 100;
+		Random rand = new Random();
+		int speed = 20;
+		ArrayList<ParticleImplode> pArray = new ArrayList<ParticleImplode>();
+		for(int i = 0; i < pNum; i ++){
+			pArray.add(new ParticleImplode(x,y,(rand.nextDouble() * speed) - (speed / 2),(rand.nextDouble() * speed) - speed / 2,c));
+		}
+		return pArray;
+		
+	}
 	/*TODO
-	 * Implode
+	 * Implode - WIP
 	 * Warp-Speed line things?
 	 * Swirly explosion
 	 * Sparks

@@ -33,6 +33,7 @@ public class Particle {
 		this.y += speedY;
 		this.speedX -= speedX / 100;
 		this.speedY -= speedY / 100;
+		//TODO MOVE CHECK-DEAD STUFF TO MAKE IT OOP-ABLE
 		if(this.x > main.Main.w || this.x < 0){
 			this.dead = true;
 		}

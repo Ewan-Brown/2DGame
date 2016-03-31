@@ -14,7 +14,6 @@ public class Alien extends EntityAI {
 		this.speed = 0.5;
 	}
 
-	//TODO AI IS BROKEN!
 	public void updateTarget(ArrayList<Entity> targetArray) {
 		double targets = targetArray.size();
 		double dist;
