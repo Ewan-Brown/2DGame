@@ -14,15 +14,15 @@ public class Target extends EntityAI{
 		super(width, height, x, y);
 		this.color = Color.YELLOW;
 	}
-	public void updateTarget(ArrayList<Alien> friendlyArray) {
-		double targets = friendlyArray.size();
+	public void updateTarget(ArrayList<Alien> alienArray) {
+		double targets = alienArray.size();
 		double dist;
 		double prevDist = 9999;
 		for(int i = 0; i < targets; i++){
-			if(friendlyArray.get(i).dead == false){
-				dist = GameMath.getDistance(this, friendlyArray.get(i));
+			if(alienArray.get(i).dead == false){
+				dist = GameMath.getDistance(this, alienArray.get(i));
 				if(dist < prevDist){
-					target = friendlyArray.get(i);
+					target = alienArray.get(i);
 				}
 				prevDist = dist;
 			}

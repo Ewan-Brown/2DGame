@@ -15,7 +15,6 @@ public class EntityAI extends Entity{
 		if(target == null){
 			return;
 		}
-//		angle = GameMath.getAngle(x, y, target.x,target.y);
 		angle = Math.atan2(target.y - y, target.x - x);
 		deltaX = speed * Math.cos(angle);
 		deltaY = speed * Math.sin(angle);

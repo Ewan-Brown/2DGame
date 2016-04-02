@@ -12,11 +12,10 @@ import java.util.Random;
 
 import javax.swing.JPanel;
 
-import effects.Effects;
 import effects.Particle;
 import entities.Alien;
+import entities.Bullet;
 import entities.Entity;
-import entities.EntityAI;
 import entities.Player;
 import entities.Target;
 
@@ -32,6 +31,7 @@ public class GamePanel extends JPanel implements KeyListener{
 	Alien cAlien;
 	Entity cFriendly;
 	Target cTarget;
+	Bullet cBullet;
 	int aliens = 1;
 	int panelWidth;
 	int panelHeight;
@@ -40,14 +40,15 @@ public class GamePanel extends JPanel implements KeyListener{
 	BitSet keySet = new BitSet(256);
 	double playerSpeedControl = 1;
 	double player2SpeedControl = 1;
-	int count = 0;
-	int count2 = 0;
+	int speedShiftCount = 0;
+	int speedShiftCount2 = 0;
 	boolean i,j,k,l,w,a,s,d;
 	//TODO SORT THIS OUT
 	public ArrayList<Particle> particleArray = new ArrayList<Particle>();
 	public ArrayList<Alien> alienArray = new ArrayList<Alien>();
 	public ArrayList<Player> playerArray = new ArrayList<Player>();
 	public ArrayList<Target> targetArray = new ArrayList<Target>();
+	public ArrayList<Bullet> bulletArray = new ArrayList<Bullet>();
 	Particle cParticle;
 	Random rand;
 	public GamePanel(int w, int h){
@@ -61,6 +62,7 @@ public class GamePanel extends JPanel implements KeyListener{
 		this.setBackground(Color.BLACK);
 	}
 	public void startGame(){
+		bulletArray.clear();
 		alienArray.clear();
 		playerArray.clear();
 		targetArray.clear();
@@ -80,11 +82,11 @@ public class GamePanel extends JPanel implements KeyListener{
 		targetArray.add(new Target(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 	}
 	public void update(){
-		System.out.println(targetArray.size());
 		updateEffects();
 		doKeyActions();
 		moveAliens();
 		moveTargets();
+		moveBullets();
 		checkCollisions();
 		if(checkAllDead()){
 			startGame();
@@ -117,6 +119,7 @@ public class GamePanel extends JPanel implements KeyListener{
 		drawTargets(g2);
 		drawPlayers(g2);
 		drawAliens(g2);
+		drawBullets(g2);
 		drawEffects(g2);
 		g2.setColor(Color.BLACK);
 //		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -131,11 +134,18 @@ public class GamePanel extends JPanel implements KeyListener{
 			g.fillRect((int)cParticle.x, (int)cParticle.y, 2, 2);
 		}
 	}
+	public void drawBullets(Graphics g){
+		for(int i = 0; i < bulletArray.size(); i++){
+			cBullet = bulletArray.get(i);
+			g.setColor(cBullet.color);
+			g.fillRect((int)cBullet.x, (int)cBullet.y, cBullet.width, cBullet.height);
+		}
+	}
 	public void drawTargets(Graphics g){
 		for(int i = 0; i < targetArray.size(); i++){
-			cFriendly = targetArray.get(i);
-			g.setColor(cFriendly.color);
-			g.fillRect((int)cFriendly.x - ((cFriendly.width - 1) / 2), (int)cFriendly.y - ((cFriendly.height - 1) / 2), cFriendly.width ,cFriendly.height);
+			cTarget = targetArray.get(i);
+			g.setColor(cTarget.color);
+			g.fillRect((int)cTarget.x - ((cTarget.width - 1) / 2), (int)cTarget.y - ((cTarget.height - 1) / 2), cTarget.width ,cTarget.height);
 		}
 	}
 	public void drawPlayers(Graphics g){
@@ -168,18 +178,43 @@ public class GamePanel extends JPanel implements KeyListener{
 			tempArray.addAll(targetArray);
 			cAlien.updateTarget(tempArray);
 			cAlien.moveAI();
+			cBullet = cAlien.tryShoot();
+			if(cBullet != null){
+				bulletArray.add(cBullet);
+			}
+			
+			
+		}
+	}
+	public void moveBullets(){
+		for(int i = 0; i < bulletArray.size(); i++){
+			cBullet = bulletArray.get(i);
+			cBullet.moveAI();
 		}
 	}
 	public void checkCollisions(){
+		ArrayList<Entity> tempArray = new ArrayList<Entity>();
+		tempArray.addAll(playerArray);
+		tempArray.addAll(targetArray);
 		for(int i = 0; i < alienArray.size(); i ++){
 			cAlien = alienArray.get(i);
-			ArrayList<Entity> tempArray = new ArrayList<Entity>();
-			tempArray.addAll(playerArray);
-			tempArray.addAll(targetArray);
 			for(int j = 0; j < tempArray.size(); j++){
 				cFriendly = tempArray.get(j);
 				if(cFriendly.dead == false){
 					if(GameMath.getDistance(cAlien, cFriendly) < ((cAlien.width + 1) / 2) + ((cFriendly.width + 1) / 2)){
+						cFriendly.onCollision();
+						particleArray.addAll(cFriendly.onDeath());
+					}
+				}
+				
+			}
+		}
+		for(int i = 0; i < bulletArray.size(); i++){
+			cBullet = bulletArray.get(i);
+			for(int j = 0; j < tempArray.size(); j++){
+				cFriendly = tempArray.get(j);
+				if(cFriendly.dead == false){
+					if(GameMath.getDistance(cBullet, cFriendly) < ((cAlien.width + 1) / 2) + ((cFriendly.width + 1) / 2)){
 						cFriendly.onCollision();
 						particleArray.addAll(cFriendly.onDeath());
 					}
@@ -213,36 +248,36 @@ public class GamePanel extends JPanel implements KeyListener{
 
 	}
 	public void doKeyActions(){
-		count++;
+		speedShiftCount++;
 		getKeys();
 		if(keySet.get(KeyEvent.VK_Q)){
-			if(count > 30){
-				count = 0;
+			if(speedShiftCount > 30){
+				speedShiftCount = 0;
 				if(playerSpeedControl < 30){
 					playerSpeedControl += 1;
 				}
 			}
 		}
 		if(keySet.get(KeyEvent.VK_E)){
-			if(count > 30){
-				count = 0;
+			if(speedShiftCount > 30){
+				speedShiftCount = 0;
 				if(playerSpeedControl > 1){
 					playerSpeedControl -= 1;
 				}
 			}
 		}
-		count2++;
+		speedShiftCount2++;
 		if(keySet.get(KeyEvent.VK_U)){
-			if(count2 > 30){
-				count2 = 0;
+			if(speedShiftCount2 > 30){
+				speedShiftCount2 = 0;
 				if(player2SpeedControl < 30){
 					player2SpeedControl += 1;
 				}
 			}
 		}
 		if(keySet.get(KeyEvent.VK_O)){
-			if(count2 > 30){
-				count2 = 0;
+			if(speedShiftCount2 > 30){
+				speedShiftCount2 = 0;
 				if(player2SpeedControl > 1){
 					player2SpeedControl -= 1;
 				}
