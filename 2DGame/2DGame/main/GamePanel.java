@@ -28,6 +28,7 @@ public class GamePanel extends JPanel implements KeyListener{
 	private static final long serialVersionUID = 1L;
 	Player player1;
 	Player player2;
+	//TODO GET RID OF ALL THESE 'c' TEMPORARY OBJECTS!
 	Alien cAlien;
 	Entity cFriendly;
 	Target cTarget;
@@ -46,8 +47,8 @@ public class GamePanel extends JPanel implements KeyListener{
 	public ArrayList<Particle> particleArray = new ArrayList<Particle>();
 	public ArrayList<Alien> alienArray = new ArrayList<Alien>();
 	public ArrayList<Player> playerArray = new ArrayList<Player>();
-	public ArrayList<Entity> friendlyArray = new ArrayList<Entity>();
-	Particle p;
+	public ArrayList<Target> targetArray = new ArrayList<Target>();
+	Particle cParticle;
 	Random rand;
 	public GamePanel(int w, int h){
 		rand = new Random();
@@ -62,11 +63,12 @@ public class GamePanel extends JPanel implements KeyListener{
 	public void startGame(){
 		alienArray.clear();
 		playerArray.clear();
+		targetArray.clear();
 		player1 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.GREEN);
 		player2 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.BLUE);
 		for(int i = 0; i < aliens; i++){
 			spawnAlien();
-			spawnAlien();
+			spawnTarget();
 		}
 		playerArray.add(player1);
 		playerArray.add(player2);
@@ -74,7 +76,11 @@ public class GamePanel extends JPanel implements KeyListener{
 	public void spawnAlien(){
 		alienArray.add(new Alien(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 	}
+	public void spawnTarget(){
+		targetArray.add(new Target(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
+	}
 	public void update(){
+		System.out.println(targetArray.size());
 		updateEffects();
 		doKeyActions();
 		moveAliens();
@@ -120,23 +126,23 @@ public class GamePanel extends JPanel implements KeyListener{
 	}
 	public void drawEffects(Graphics g){
 		for(int i = 0; i < particleArray.size();i++){
-			p = particleArray.get(i);
-			g.setColor(p.color);
-			g.fillRect((int)p.x, (int)p.y, 2, 2);
+			cParticle = particleArray.get(i);
+			g.setColor(cParticle.color);
+			g.fillRect((int)cParticle.x, (int)cParticle.y, 2, 2);
 		}
 	}
 	public void drawTargets(Graphics g){
-//		for(int i = 0; i < targetArray.size(); i++){
-//			cFriendly = targetArray.get(i);
-//			g.setColor(cFriendly.color);
-//			g.fillRect((int)cFriendly.x - ((cFriendly.w - 1) / 2), (int)cFriendly.y - ((cFriendly.h - 1) / 2), cFriendly.w ,cFriendly.h);
-//		}
+		for(int i = 0; i < targetArray.size(); i++){
+			cFriendly = targetArray.get(i);
+			g.setColor(cFriendly.color);
+			g.fillRect((int)cFriendly.x - ((cFriendly.width - 1) / 2), (int)cFriendly.y - ((cFriendly.height - 1) / 2), cFriendly.width ,cFriendly.height);
+		}
 	}
 	public void drawPlayers(Graphics g){
 		for(int i = 0; i < playerArray.size(); i++){
 			cFriendly = playerArray.get(i);
 			g.setColor(cFriendly.color);
-			g.fillRect((int)cFriendly.x - ((cFriendly.w - 1) / 2), (int)cFriendly.y - ((cFriendly.h - 1) / 2), cFriendly.w ,cFriendly.h);
+			g.fillRect((int)cFriendly.x - ((cFriendly.width - 1) / 2), (int)cFriendly.y - ((cFriendly.height - 1) / 2), cFriendly.width ,cFriendly.height);
 
 		}
 	}
@@ -144,20 +150,22 @@ public class GamePanel extends JPanel implements KeyListener{
 		for(int i = 0; i < alienArray.size(); i ++){
 			cAlien = alienArray.get(i);
 			g.setColor(cAlien.color);
-			g.fillRect((int)cAlien.x - ((cAlien.w - 1) / 2), (int)cAlien.y - ((cAlien.h - 1) / 2), cAlien.w ,cAlien.h);
+			g.fillRect((int)cAlien.x - ((cAlien.width - 1) / 2), (int)cAlien.y - ((cAlien.height - 1) / 2), cAlien.width ,cAlien.height);
 		}
 	}
 	public void moveTargets() {
-//		for(int i = 0; i < targetArray.size(); i ++){
-//		}
-		
+		for(int i = 0; i < targetArray.size(); i++){
+			cTarget = targetArray.get(i);
+			cTarget.updateTarget(alienArray);
+			cTarget.moveAI();
+		}
 	}
 	public void moveAliens(){
 		for(int i = 0; i < alienArray.size(); i ++){
 			cAlien = alienArray.get(i);
 			ArrayList<Entity> tempArray = new ArrayList<Entity>();
 			tempArray.addAll(playerArray);
-			tempArray.addAll(playerArray);
+			tempArray.addAll(targetArray);
 			cAlien.updateTarget(tempArray);
 			cAlien.moveAI();
 		}
@@ -165,13 +173,15 @@ public class GamePanel extends JPanel implements KeyListener{
 	public void checkCollisions(){
 		for(int i = 0; i < alienArray.size(); i ++){
 			cAlien = alienArray.get(i);
-			for(int j = 0; j < playerArray.size(); j++){
-				cFriendly = playerArray.get(j);
+			ArrayList<Entity> tempArray = new ArrayList<Entity>();
+			tempArray.addAll(playerArray);
+			tempArray.addAll(targetArray);
+			for(int j = 0; j < tempArray.size(); j++){
+				cFriendly = tempArray.get(j);
 				if(cFriendly.dead == false){
-					if(GameMath.getDistance(cAlien, cFriendly) < ((cAlien.w + 1) / 2) + ((cFriendly.w + 1) / 2)){
+					if(GameMath.getDistance(cAlien, cFriendly) < ((cAlien.width + 1) / 2) + ((cFriendly.width + 1) / 2)){
 						cFriendly.onCollision();
-						particleArray.addAll(Effects.implode(cFriendly.x, cFriendly.y, cFriendly.color));
-						particleArray.addAll(Effects.swirlyParticle(cFriendly.x, cFriendly.y, cFriendly.color));
+						particleArray.addAll(cFriendly.onDeath());
 					}
 				}
 				
@@ -179,14 +189,17 @@ public class GamePanel extends JPanel implements KeyListener{
 		}
 	}
 	public boolean checkAllDead(){
-		boolean allDead = true;
 		for(int i = 0; i < playerArray.size();i++){
 			if(playerArray.get(i).dead == false){
-				allDead = false;
-				break;
+				return false;
 			}
 		}
-		return allDead;
+		for(int i = 0; i < targetArray.size(); i++){
+			if(targetArray.get(i).dead == false){
+				return false;
+			}
+		}
+		return true;
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {}

@@ -2,7 +2,9 @@ package entities;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
 
+import effects.Particle;
 import main.GameMath;
 import main.GamePanel;
 import main.Main;
@@ -12,8 +14,8 @@ public class Entity {
 	public String name;
 	public double x, y;
 	int health;
-	public int w = 10;
-	public int h = 10;
+	public int width = 10;
+	public int height = 10;
 	int MAX_X;
 	int MAX_Y;
 	public double speed;
@@ -31,8 +33,8 @@ public class Entity {
 	public void onCollision(){
 		this.dead = true;
 	}
-	public void onDeath(){
-
+	public ArrayList<? extends Particle> onDeath(){
+		return new ArrayList<Particle>();
 	}
 	public void moveEntity(double x, double y){
 		if(!dead){
@@ -47,21 +49,21 @@ public class Entity {
 		this.checkWallCollision();
 	}
 	public void checkWallCollision(){
-		l = (this.x - (this.w - 1) / 2);
-		r = (this.x +(this.w - 1) / 2);
-		u = (this.y - (this.h - 1) / 2);
-		d = (this.y +(this.h - 1) / 2);
+		l = (this.x - (this.width - 1) / 2);
+		r = (this.x +(this.width - 1) / 2);
+		u = (this.y - (this.height - 1) / 2);
+		d = (this.y +(this.height - 1) / 2);
 		if(l < 0){
-			this.x = (this.w - 1) / 2;
+			this.x = (this.width - 1) / 2;
 		}
 		if(r > MAX_X){
-			this.x = MAX_X - (this.w - 1) / 2;
+			this.x = MAX_X - (this.width - 1) / 2;
 		}
 		if(u < 0){
-			this.y = (this.h - 1) / 2;
+			this.y = (this.height - 1) / 2;
 		}
 		if(d > MAX_Y){
-			this.y = MAX_Y - (this.h - 1) / 2;
+			this.y = MAX_Y - (this.height - 1) / 2;
 		}
 	}
 }

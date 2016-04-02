@@ -1,6 +1,11 @@
 package entities;
 
 import java.awt.Color;
+import java.util.ArrayList;
+
+import effects.Effects;
+import effects.Particle;
+import effects.ParticleImplode;
 
 public class Player extends Entity{
 	public boolean sprint;
@@ -14,6 +19,10 @@ public class Player extends Entity{
 			speed *= 2;
 		}
 		super.moveEntity(x, y);
+	}
+	public ArrayList<ParticleImplode> onDeath(){
+		return Effects.implode(this.x, this.y, this.color);
+
 	}
 
 }

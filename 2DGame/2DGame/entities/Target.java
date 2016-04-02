@@ -3,6 +3,9 @@ package entities;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import effects.Effects;
+import effects.ParticleImplode;
+import effects.ParticleSwirly;
 import main.GameMath;
 
 public class Target extends EntityAI{
@@ -24,6 +27,10 @@ public class Target extends EntityAI{
 				prevDist = dist;
 			}
 		}
+	}
+	public ArrayList<ParticleSwirly> onDeath(){
+		return Effects.swirlyParticle(this.x, this.y, this.color);
+
 	}
 	public void moveAI(){
 		//TODO duplicated code! 
@@ -53,24 +60,24 @@ public class Target extends EntityAI{
 		checkWallCollision();
 	}
 	public void checkWallCollision(){
-		l = (this.x - (this.w - 1) / 2);
-		r = (this.x +(this.w - 1) / 2);
-		u = (this.y - (this.h - 1) / 2);
-		d = (this.y +(this.h - 1) / 2);
+		l = (this.x - (this.width - 1) / 2);
+		r = (this.x +(this.width - 1) / 2);
+		u = (this.y - (this.height - 1) / 2);
+		d = (this.y +(this.height - 1) / 2);
 		if(l < 0){
-			this.x = (this.w - 1) / 2;
+			this.x = (this.width - 1) / 2;
 			sX = true;
 		}
 		if(r > MAX_X){
-			this.x = MAX_X - (this.w - 1) / 2;
+			this.x = MAX_X - (this.width - 1) / 2;
 			sX = true;
 		}
 		if(u < 0){
-			this.y = (this.h - 1) / 2;
+			this.y = (this.height - 1) / 2;
 			sY = true;
 		}
 		if(d > MAX_Y){
-			this.y = MAX_Y - (this.h - 1) / 2;
+			this.y = MAX_Y - (this.height - 1) / 2;
 			sY = true;
 		}
 	}
