@@ -1,9 +1,29 @@
 package entities;
 
-public class Target extends Alien{
+import java.awt.Color;
+import java.util.ArrayList;
+
+import main.GameMath;
+
+public class Target extends EntityAI{
 	boolean sX,sY;
 	public Target(int width, int height, int x, int y) {
 		super(width, height, x, y);
+		this.color = Color.YELLOW;
+	}
+	public void updateTarget(ArrayList<Alien> friendlyArray) {
+		double targets = friendlyArray.size();
+		double dist;
+		double prevDist = 9999;
+		for(int i = 0; i < targets; i++){
+			if(friendlyArray.get(i).dead == false){
+				dist = GameMath.getDistance(this, friendlyArray.get(i));
+				if(dist < prevDist){
+					target = friendlyArray.get(i);
+				}
+				prevDist = dist;
+			}
+		}
 	}
 	public void moveAI(){
 		//TODO duplicated code! 

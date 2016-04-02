@@ -1,20 +1,22 @@
 package main;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
 
 import javax.swing.JFrame;
 
 public class Main{
-	GamePanel panel;
-	JFrame frame;
+	static GamePanel panel;
+	static JFrame frame;
 	public static int w = 400;
 	public static int h = 400;
 	int speed = 1;
 	Dimension preferredSize;
+	static Main main;
 	public static void main(String[] args){
-		Main main = new Main();
+		Main();
 	}
-	public void gameLoop(){
+	public static void gameLoop(){
 		//TODO Increase framerate but keep gamespeed?!?!
 		while(true){
 			panel.update();
@@ -26,7 +28,7 @@ public class Main{
 			}
 		}
 	}
-	public Main(){
+	public static void Main(){
 		frame = new JFrame("2D Game");
 		panel = new GamePanel(w,h);
 		frame.add(panel);

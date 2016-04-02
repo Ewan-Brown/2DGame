@@ -1,8 +1,11 @@
 package entities;
 
 import java.awt.Color;
+import java.awt.Graphics;
 
 import main.GameMath;
+import main.GamePanel;
+import main.Main;
 
 public class Entity {
 
@@ -27,6 +30,9 @@ public class Entity {
 	}
 	public void onCollision(){
 		this.dead = true;
+	}
+	public void onDeath(){
+
 	}
 	public void moveEntity(double x, double y){
 		if(!dead){

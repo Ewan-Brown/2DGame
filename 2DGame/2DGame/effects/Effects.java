@@ -52,6 +52,17 @@ public class Effects {
 		return pArray;
 		
 	}
+	public static ArrayList<ParticleSpiral> spiral(double x, double y, Color c){
+		int pNum = 100;
+		Random rand = new Random();
+		int speed = 20;
+		ArrayList<ParticleSpiral> pArray = new ArrayList<ParticleSpiral>();
+		for(int i = 0; i < pNum; i ++){
+			pArray.add(new ParticleSpiral(x,y,(rand.nextDouble() * speed) - (speed / 2),(rand.nextDouble() * speed) - speed / 2,c));
+		}
+		return pArray;
+		
+	}
 	/*TODO
 	 * Implode - WIP
 	 * Warp-Speed line things?

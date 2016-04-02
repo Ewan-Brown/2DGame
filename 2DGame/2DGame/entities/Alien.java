@@ -11,18 +11,18 @@ public class Alien extends EntityAI {
 	public Alien(int w, int h, int x, int y) {
 		super(w, h, x, y);
 		this.color = Color.red;
-		this.speed = 0.5;
+		this.speed = 1;
 	}
 
-	public void updateTarget(ArrayList<Entity> targetArray) {
-		double targets = targetArray.size();
+	public void updateTarget(ArrayList<Entity> friendlyArray) {
+		double targets = friendlyArray.size();
 		double dist;
 		double prevDist = 9999;
 		for(int i = 0; i < targets; i++){
-			if(targetArray.get(i).dead == false){
-				dist = GameMath.getDistance(this, targetArray.get(i));
+			if(friendlyArray.get(i).dead == false){
+				dist = GameMath.getDistance(this, friendlyArray.get(i));
 				if(dist < prevDist){
-					target = targetArray.get(i);
+					target = friendlyArray.get(i);
 				}
 				prevDist = dist;
 			}

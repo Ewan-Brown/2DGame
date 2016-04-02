@@ -16,7 +16,9 @@ import effects.Effects;
 import effects.Particle;
 import entities.Alien;
 import entities.Entity;
+import entities.EntityAI;
 import entities.Player;
+import entities.Target;
 
 public class GamePanel extends JPanel implements KeyListener{
 
@@ -27,6 +29,8 @@ public class GamePanel extends JPanel implements KeyListener{
 	Player player1;
 	Player player2;
 	Alien cAlien;
+	Entity cFriendly;
+	Target cTarget;
 	int aliens = 1;
 	int panelWidth;
 	int panelHeight;
@@ -37,11 +41,12 @@ public class GamePanel extends JPanel implements KeyListener{
 	double player2SpeedControl = 1;
 	int count = 0;
 	int count2 = 0;
-	boolean sprint;
 	boolean i,j,k,l,w,a,s,d;
+	//TODO SORT THIS OUT
 	public ArrayList<Particle> particleArray = new ArrayList<Particle>();
 	public ArrayList<Alien> alienArray = new ArrayList<Alien>();
-	public ArrayList<Entity> targets = new ArrayList<Entity>();
+	public ArrayList<Player> playerArray = new ArrayList<Player>();
+	public ArrayList<Entity> friendlyArray = new ArrayList<Entity>();
 	Particle p;
 	Random rand;
 	public GamePanel(int w, int h){
@@ -54,25 +59,30 @@ public class GamePanel extends JPanel implements KeyListener{
 		startGame();
 		this.setBackground(Color.BLACK);
 	}
-	
 	public void startGame(){
 		alienArray.clear();
-		targets.clear();
+		playerArray.clear();
 		player1 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.GREEN);
 		player2 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.BLUE);
 		for(int i = 0; i < aliens; i++){
-			alienArray.add(new Alien(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
-//			alienArray.add(new Target(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));   
+			spawnAlien();
+			spawnAlien();
 		}
-		targets.add(player1);
-		targets.add(player2);
+		playerArray.add(player1);
+		playerArray.add(player2);
 	}
-
+	public void spawnAlien(){
+		alienArray.add(new Alien(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
+	}
 	public void update(){
 		updateEffects();
 		doKeyActions();
-		moveAlien();
+		moveAliens();
+		moveTargets();
 		checkCollisions();
+		if(checkAllDead()){
+			startGame();
+		}
 		this.repaint();
 	}
 	public void updateEffects(){
@@ -98,11 +108,11 @@ public class GamePanel extends JPanel implements KeyListener{
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D) g;
-		drawPlayer(g2,player1);
-		drawPlayer(g2,player2);
+		drawTargets(g2);
+		drawPlayers(g2);
 		drawAliens(g2);
 		drawEffects(g2);
-		g.setColor(Color.BLACK);
+		g2.setColor(Color.BLACK);
 //		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
 //    		RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 //	    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
@@ -115,9 +125,20 @@ public class GamePanel extends JPanel implements KeyListener{
 			g.fillRect((int)p.x, (int)p.y, 2, 2);
 		}
 	}
-	public void drawPlayer(Graphics g, Player player){
-		g.setColor(player.color);
-		g.fillRect((int)player.x - ((player.w - 1) / 2), (int)player.y - ((player.h - 1) / 2), player.w ,player.h);
+	public void drawTargets(Graphics g){
+//		for(int i = 0; i < targetArray.size(); i++){
+//			cFriendly = targetArray.get(i);
+//			g.setColor(cFriendly.color);
+//			g.fillRect((int)cFriendly.x - ((cFriendly.w - 1) / 2), (int)cFriendly.y - ((cFriendly.h - 1) / 2), cFriendly.w ,cFriendly.h);
+//		}
+	}
+	public void drawPlayers(Graphics g){
+		for(int i = 0; i < playerArray.size(); i++){
+			cFriendly = playerArray.get(i);
+			g.setColor(cFriendly.color);
+			g.fillRect((int)cFriendly.x - ((cFriendly.w - 1) / 2), (int)cFriendly.y - ((cFriendly.h - 1) / 2), cFriendly.w ,cFriendly.h);
+
+		}
 	}
 	public void drawAliens(Graphics g){
 		for(int i = 0; i < alienArray.size(); i ++){
@@ -126,37 +147,46 @@ public class GamePanel extends JPanel implements KeyListener{
 			g.fillRect((int)cAlien.x - ((cAlien.w - 1) / 2), (int)cAlien.y - ((cAlien.h - 1) / 2), cAlien.w ,cAlien.h);
 		}
 	}
-	public void moveAlien(){
+	public void moveTargets() {
+//		for(int i = 0; i < targetArray.size(); i ++){
+//		}
+		
+	}
+	public void moveAliens(){
 		for(int i = 0; i < alienArray.size(); i ++){
 			cAlien = alienArray.get(i);
-			cAlien.updateTarget(targets);
+			ArrayList<Entity> tempArray = new ArrayList<Entity>();
+			tempArray.addAll(playerArray);
+			tempArray.addAll(playerArray);
+			cAlien.updateTarget(tempArray);
 			cAlien.moveAI();
 		}
 	}
 	public void checkCollisions(){
 		for(int i = 0; i < alienArray.size(); i ++){
 			cAlien = alienArray.get(i);
-			if((GameMath.getDistance(player1,cAlien) < ((player1.w + 1) / 2)  + (cAlien.w + 1) / 2)){
-				if(player1.dead == false){
-					player1.onCollision();
-					particleArray.addAll(Effects.implode(player1.x, player1.y, Color.RED));
-//					particleArray.addAll(Effects.fireworks(Effects.explode(player1.x, player1.y,player1.color)));
-//					particleArray.addAll(Effects.fireworksSwirly(Effects.swirlyParticle(player1.x,player1.y, player1.color)));
+			for(int j = 0; j < playerArray.size(); j++){
+				cFriendly = playerArray.get(j);
+				if(cFriendly.dead == false){
+					if(GameMath.getDistance(cAlien, cFriendly) < ((cAlien.w + 1) / 2) + ((cFriendly.w + 1) / 2)){
+						cFriendly.onCollision();
+						particleArray.addAll(Effects.implode(cFriendly.x, cFriendly.y, cFriendly.color));
+						particleArray.addAll(Effects.swirlyParticle(cFriendly.x, cFriendly.y, cFriendly.color));
+					}
 				}
-			}
-			if((GameMath.getDistance(player2,cAlien) < ((player2.w + 1) / 2) + (cAlien.w + 1) / 2)){
-				if(player2.dead == false){
-					player2.onCollision();
-					
-//					particleArray.addAll(Effects.fireworks(Effects.explode(player2.x, player2.y,player2.color)));
-//					particleArray.addAll(Effects.swirlyParticle(player2.x, player2.y, player2.color));
-				}
+				
 			}
 		}
-		if(player1.dead == true && player2.dead == true){
-			//TODO make this a full 'restart' method 
-			startGame();
+	}
+	public boolean checkAllDead(){
+		boolean allDead = true;
+		for(int i = 0; i < playerArray.size();i++){
+			if(playerArray.get(i).dead == false){
+				allDead = false;
+				break;
+			}
 		}
+		return allDead;
 	}
 	@Override
 	public void keyTyped(KeyEvent e) {}
