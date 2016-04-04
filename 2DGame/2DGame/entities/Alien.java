@@ -2,6 +2,7 @@ package entities;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Random;
 
 import effects.Effects;
 import effects.Particle;
@@ -11,9 +12,11 @@ public class Alien extends EntityAI {
 	double angle;
 	int COOLDOWN = 50;
 	int cooldownTimer = 250;
+	Random rand;
 
 	public Alien(int w, int h, int x, int y) {
 		super(w, h, x, y);
+		rand = new Random();
 		this.color = Color.red;
 		this.speed = 1;
 	}
@@ -39,7 +42,7 @@ public class Alien extends EntityAI {
 			if(cooldownTimer < 1){
 				cooldownTimer = COOLDOWN;
 				double speedX,speedY;
-				angle = Math.atan2(target.y - y, target.x - x);
+				angle = Math.atan2(target.y - y, target.x - x) + ((rand.nextDouble() - 0.5) * 0.1);
 				speedX = 2.0 * Math.cos(angle);
 				speedY = 2.0 * Math.sin(angle);
 				bArray.add(new Bullet(MAX_X,MAX_Y,(int)x,(int)y,speedX,speedY));
