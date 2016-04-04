@@ -3,11 +3,14 @@ package entities;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import effects.Effects;
+import effects.Particle;
 import main.GameMath;
 
 public class Alien extends EntityAI {
 	double angle;
-	int cooldown = 100;
+	int COOLDOWN = 50;
+	int cooldownTimer = 250;
 
 	public Alien(int w, int h, int x, int y) {
 		super(w, h, x, y);
@@ -16,6 +19,7 @@ public class Alien extends EntityAI {
 	}
 
 	public void updateTarget(ArrayList<Entity> friendlyArray) {
+		System.out.println(System.nanoTime());
 		double targets = friendlyArray.size();
 		double dist;
 		double prevDist = 9999;
@@ -29,19 +33,28 @@ public class Alien extends EntityAI {
 			}
 		}
 	}
-	public Bullet tryShoot(){
-		cooldown--;
-		Bullet b = null;
-		if(cooldown < 1){
-			System.out.println("HEY");
-			cooldown = 120;
-			double speedX,speedY;
-			angle = Math.atan2(target.y - y, target.x - x);
-			speedX = 2.5 * Math.cos(angle);
-			speedY = 2.5 * Math.sin(angle);
-			b = new Bullet(MAX_X,MAX_Y,(int)x,(int)y,speedX,speedY);
+	public ArrayList<Bullet> tryShoot(){
+		ArrayList<Bullet> bArray = new ArrayList<Bullet>();
+		if(!dead){
+			cooldownTimer--;
+			if(cooldownTimer < 1){
+				cooldownTimer = COOLDOWN;
+				double speedX,speedY;
+				angle = Math.atan2(target.y - y, target.x - x);
+				speedX = 2.0 * Math.cos(angle);
+				speedY = 2.0 * Math.sin(angle);
+				bArray.add(new Bullet(MAX_X,MAX_Y,(int)x,(int)y,speedX,speedY));
+			}
 		}
-		return b;
+		return bArray;
+	}
+	public ArrayList<Bullet> burstShots(){
+		ArrayList<Bullet> bArray = null;
+		
+		return bArray;
+	}
+	public ArrayList<? extends Particle> onDeath(){
+		return Effects.fireworks(Effects.explode(x, y, this.color));
 	}
 	public void moveAI() {
 		super.moveAI();

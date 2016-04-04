@@ -11,14 +11,16 @@ public class EntityAI extends Entity{
 		// TODO Auto-generated constructor stub
 	}
 	public void moveAI(){
-		
-		if(target == null){
-			return;
+		deltaX = 0;
+		deltaY = 0;
+		if(!dead){
+			if(target == null){
+				return;
+			}
+			angle = Math.atan2(target.y - y, target.x - x);
+			deltaX = speed * Math.cos(angle);
+			deltaY = speed * Math.sin(angle);
 		}
-		angle = Math.atan2(target.y - y, target.x - x);
-		deltaX = speed * Math.cos(angle);
-		deltaY = speed * Math.sin(angle);
-		
 	}
 
 }

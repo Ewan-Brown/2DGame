@@ -17,6 +17,9 @@ public class Bullet extends EntityAI{
 		this.height = 2;
 		deltaX = dX;
 		deltaY = dY;
+		//Prevents shooter from being hit by own bullets!
+		this.x += 5 *deltaX;
+		this.y += 5 *deltaY;
 		
 	}
 	
