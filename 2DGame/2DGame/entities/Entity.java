@@ -55,6 +55,7 @@ public class Entity {
 		d = (this.y +(this.height - 1) / 2);
 		if(l < 0){
 			this.x = (this.width - 1) / 2;
+//			this.dead = true;
 		}
 		if(r > MAX_X){
 			this.x = MAX_X - (this.width - 1) / 2;

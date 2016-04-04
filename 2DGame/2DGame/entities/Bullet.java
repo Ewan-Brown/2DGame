@@ -26,6 +26,12 @@ public class Bullet extends EntityAI{
 	public void moveAI(){
 		this.x += deltaX;
 		this.y += deltaY;
+		if(this.x > main.Main.w || this.x < 0){
+			this.dead = true;
+		}
+		if(this.y > main.Main.h || this.y < 0){
+			this.dead = true;
+		}
 	}
 
 }

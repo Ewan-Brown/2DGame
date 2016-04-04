@@ -16,6 +16,7 @@ import effects.Particle;
 import entities.Alien;
 import entities.Bullet;
 import entities.Entity;
+import entities.LandMine;
 import entities.Player;
 import entities.Target;
 
@@ -25,6 +26,7 @@ public class GamePanel extends JPanel implements KeyListener{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	double slideSpeed = 2;
 	Player player1;
 	Player player2;
 	//TODO GET RID OF ALL THESE 'c' TEMPORARY OBJECTS!
@@ -32,7 +34,8 @@ public class GamePanel extends JPanel implements KeyListener{
 	Entity cEntity;
 	Target cTarget;
 	Bullet cBullet;
-	int aliens = 5;
+	LandMine cMine;
+	int aliens = 1;
 	int panelWidth;
 	int panelHeight;
 	public enum Direction{Left,Right,Up,Down};
@@ -44,11 +47,12 @@ public class GamePanel extends JPanel implements KeyListener{
 	int speedShiftCount2 = 0;
 	boolean i,j,k,l,w,a,s,d;
 	//TODO SORT THIS OUT
-	public ArrayList<Particle> particleArray = new ArrayList<Particle>();
-	public ArrayList<Alien> alienArray = new ArrayList<Alien>();
+	public ArrayList<Particle> effectParticleArray = new ArrayList<Particle>();
+	public ArrayList<Alien> enemyArray = new ArrayList<Alien>();
 	public ArrayList<Player> playerArray = new ArrayList<Player>();
 	public ArrayList<Target> targetArray = new ArrayList<Target>();
 	public ArrayList<Bullet> bulletArray = new ArrayList<Bullet>();
+	public ArrayList<LandMine> mineArray = new ArrayList<LandMine>();
 	Particle cParticle;
 	Random rand;
 	public GamePanel(int w, int h){
@@ -63,21 +67,21 @@ public class GamePanel extends JPanel implements KeyListener{
 	}
 	public void startGame(){
 		bulletArray.clear();
-		alienArray.clear();
+		enemyArray.clear();
 		playerArray.clear();
 		targetArray.clear();
 		player1 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.GREEN);
 		player2 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.BLUE);
-		spawnAlien();
 		for(int i = 0; i < aliens; i++){
-//			spawnAlien();
+			spawnAlien();
+			mineArray.add(new LandMine(panelWidth,panelHeight,100,100));
 			spawnTarget();
 		}
 		playerArray.add(player1);
 		playerArray.add(player2);
 	}
 	public void spawnAlien(){
-		alienArray.add(new Alien(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
+		enemyArray.add(new Alien(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 	}
 	public void spawnTarget(){
 		targetArray.add(new Target(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
@@ -85,6 +89,7 @@ public class GamePanel extends JPanel implements KeyListener{
 	public void update(){
 		updateEffects();
 		doKeyActions();
+		updateMines();
 		moveAliens();
 		moveTargets();
 		moveBullets();
@@ -95,12 +100,12 @@ public class GamePanel extends JPanel implements KeyListener{
 		this.repaint();
 	}
 	public void updateEffects(){
-		for(int i = 0; i < particleArray.size();i++){
-			if(particleArray.get(i).dead){
-				particleArray.remove(i);
+		for(int i = 0; i < effectParticleArray.size();i++){
+			if(effectParticleArray.get(i).dead){
+				effectParticleArray.remove(i);
 			}
 			else{
-				particleArray.get(i).update();
+				effectParticleArray.get(i).update();
 			}
 		}
 	}
@@ -120,6 +125,7 @@ public class GamePanel extends JPanel implements KeyListener{
 		drawTargets(g2);
 		drawPlayers(g2);
 		drawAliens(g2);
+		drawMines(g2);
 		drawBullets(g2);
 		drawEffects(g2);
 		g2.setColor(Color.BLACK);
@@ -129,10 +135,17 @@ public class GamePanel extends JPanel implements KeyListener{
 //	    		RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 	}
 	public void drawEffects(Graphics g){
-		for(int i = 0; i < particleArray.size();i++){
-			cParticle = particleArray.get(i);
+		for(int i = 0; i < effectParticleArray.size();i++){
+			cParticle = effectParticleArray.get(i);
 			g.setColor(cParticle.color);
 			g.fillRect((int)cParticle.x, (int)cParticle.y, 2, 2);
+		}
+	}
+	public void drawMines(Graphics g){
+		g.setColor(Color.RED);
+		for(int i = 0; i < mineArray.size(); i++){
+			cMine = mineArray.get(i);
+			g.fillRect((int)cMine.x - ((cMine.width - 1) / 2), (int)cMine.y - ((cMine.height - 1) / 2), cMine.width ,cMine.height);
 		}
 	}
 	public void drawBullets(Graphics g){
@@ -158,22 +171,32 @@ public class GamePanel extends JPanel implements KeyListener{
 		}
 	}
 	public void drawAliens(Graphics g){
-		for(int i = 0; i < alienArray.size(); i ++){
-			cAlien = alienArray.get(i);
+		for(int i = 0; i < enemyArray.size(); i ++){
+			cAlien = enemyArray.get(i);
 			g.setColor(cAlien.color);
 			g.fillRect((int)cAlien.x - ((cAlien.width - 1) / 2), (int)cAlien.y - ((cAlien.height - 1) / 2), cAlien.width ,cAlien.height);
+		}
+	}
+	public void updateMines(){
+		for(int i = 0; i < mineArray.size(); i++){
+			cMine = mineArray.get(i);
+			cMine.tick();
+			if(cMine.dead){
+				bulletArray.addAll(cMine.explode());
+				mineArray.remove(i);
+			}
 		}
 	}
 	public void moveTargets() {
 		for(int i = 0; i < targetArray.size(); i++){
 			cTarget = targetArray.get(i);
-			cTarget.updateTarget(alienArray);
+			cTarget.updateTarget(enemyArray);
 			cTarget.moveAI();
 		}
 	}
 	public void moveAliens(){
-		for(int i = 0; i < alienArray.size(); i ++){
-			cAlien = alienArray.get(i);
+		for(int i = 0; i < enemyArray.size(); i ++){
+			cAlien = enemyArray.get(i);
 			ArrayList<Entity> tempArray = new ArrayList<Entity>();
 			tempArray.addAll(playerArray);
 			tempArray.addAll(targetArray);
@@ -188,34 +211,37 @@ public class GamePanel extends JPanel implements KeyListener{
 		for(int i = 0; i < bulletArray.size(); i++){
 			cBullet = bulletArray.get(i);
 			cBullet.moveAI();
+			if(cBullet.dead){
+				bulletArray.remove(i);
+			}
 		}
 	}
 	public void checkCollisions(){
 		ArrayList<Entity> tempArray = new ArrayList<Entity>();
 		tempArray.addAll(playerArray);
 		tempArray.addAll(targetArray);
-		for(int i = 0; i < alienArray.size(); i ++){
-			cAlien = alienArray.get(i);
+		for(int i = 0; i < enemyArray.size(); i ++){
+			cAlien = enemyArray.get(i);
 			for(int j = 0; j < tempArray.size(); j++){
 				cEntity = tempArray.get(j);
 				if(cEntity.dead == false){
 					if(GameMath.getDistance(cAlien, cEntity) < ((cAlien.width + 1) / 2) + ((cEntity.width + 1) / 2)){
 						cEntity.onCollision();
-						particleArray.addAll(cEntity.onDeath());
+						effectParticleArray.addAll(cEntity.onDeath());
 					}
 				}
 				
 			}
 		}
-		tempArray.addAll(alienArray);
+		tempArray.addAll(enemyArray);
 		for(int i = 0; i < bulletArray.size(); i++){
 			cBullet = bulletArray.get(i);
 			for(int j = 0; j < tempArray.size(); j++){
 				cEntity = tempArray.get(j);
-				if(cEntity.dead == false){
-					if(GameMath.getDistance(cBullet, cEntity) < ((cAlien.width + 1) / 2) + ((cEntity.width + 1) / 2)){
+				if(!cEntity.dead){
+					if(GameMath.getDistance(cBullet, cEntity) < ((cBullet.width + 1) / 2) + ((cEntity.width + 1) / 2)){
 						cEntity.onCollision();
-						particleArray.addAll(cEntity.onDeath());
+						effectParticleArray.addAll(cEntity.onDeath());
 					}
 				}
 				

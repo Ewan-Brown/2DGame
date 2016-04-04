@@ -19,7 +19,6 @@ public class Alien extends EntityAI {
 	}
 
 	public void updateTarget(ArrayList<Entity> friendlyArray) {
-		System.out.println(System.nanoTime());
 		double targets = friendlyArray.size();
 		double dist;
 		double prevDist = 9999;
@@ -58,7 +57,6 @@ public class Alien extends EntityAI {
 	}
 	public void moveAI() {
 		super.moveAI();
-		// System.out.println(deltaX+" "+deltaY+" "+angle);
 		this.x += deltaX;
 		this.y += deltaY;
 		checkWallCollision();
