@@ -1,8 +1,12 @@
 package main;
 
 import java.awt.Dimension;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
+
+import effects.Particle;
+import entities.Entity;
 
 public class Main{
 	static GamePanel panel;
@@ -14,6 +18,12 @@ public class Main{
 	static Main main;
 	public static void main(String[] args){
 		start();
+//		r is the radius of the circle
+//		w = 2 * pi * f, where f is the frequency of the rotation
+//		t is the time (s) 
+//		
+//		x = r * sin(w*t);
+//		y = r * cos(w*t);
 	}
 	public static void gameLoop(){
 		//TODO Increase framerate but keep gamespeed?!?!

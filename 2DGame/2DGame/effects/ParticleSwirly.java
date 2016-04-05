@@ -29,7 +29,7 @@ public class ParticleSwirly extends Particle{
 				speedX = -speedX;
 			}
 		}
-		//TODO CLEA THIS DUPLICATED CODE
+		//TODO CLEAR THIS DUPLICATED CODE
 		this.baseSpeedX -= baseSpeedX / 100;
 		this.baseSpeedY -=baseSpeedY / 100;
 		if(Math.abs(baseSpeedX) < 0.2 && Math.abs(baseSpeedY) < 0.2){

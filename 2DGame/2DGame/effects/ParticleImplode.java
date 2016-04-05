@@ -20,8 +20,8 @@ public class ParticleImplode extends Particle{
 			return;
 		}
 		//TODO HOLY CRAP THIS ONE IS COOl
-//		this.speedX -= antiX + speedX / 10;
-//		this.speedY -= antiY + speedX / 10;		
+//		this.speedX -= antiX + speedX / 100;
+//		this.speedY -= antiY + speedX / 100;		
 		this.speedX -= antiX;
 		this.speedY -= antiY;	
 		this.x += speedX;

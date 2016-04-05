@@ -48,7 +48,7 @@ public class GamePanel extends JPanel implements KeyListener{
 	boolean i,j,k,l,w,a,s,d;
 	//TODO SORT THIS OUT
 	public ArrayList<Particle> effectParticleArray = new ArrayList<Particle>();
-	public ArrayList<Alien> enemyArray = new ArrayList<Alien>();
+	public ArrayList<Alien> alienArray = new ArrayList<Alien>();
 	public ArrayList<Player> playerArray = new ArrayList<Player>();
 	public ArrayList<Target> targetArray = new ArrayList<Target>();
 	public ArrayList<Bullet> bulletArray = new ArrayList<Bullet>();
@@ -67,21 +67,21 @@ public class GamePanel extends JPanel implements KeyListener{
 	}
 	public void startGame(){
 		bulletArray.clear();
-		enemyArray.clear();
+		alienArray.clear();
 		playerArray.clear();
 		targetArray.clear();
 		player1 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.GREEN);
 		player2 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.BLUE);
 		for(int i = 0; i < aliens; i++){
 			spawnAlien();
-			mineArray.add(new LandMine(panelWidth,panelHeight,100,100));
+//			mineArray.add(new LandMine(panelWidth,panelHeight,100,100));
 			spawnTarget();
 		}
 		playerArray.add(player1);
 		playerArray.add(player2);
 	}
 	public void spawnAlien(){
-		enemyArray.add(new Alien(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
+		alienArray.add(new Alien(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 	}
 	public void spawnTarget(){
 		targetArray.add(new Target(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
@@ -94,7 +94,10 @@ public class GamePanel extends JPanel implements KeyListener{
 		moveTargets();
 		moveBullets();
 		checkCollisions();
-		if(checkAllDead()){
+		if(checkGameLose()){
+			startGame();
+		}
+		if(checkGameWin()){
 			startGame();
 		}
 		this.repaint();
@@ -152,7 +155,7 @@ public class GamePanel extends JPanel implements KeyListener{
 		for(int i = 0; i < bulletArray.size(); i++){
 			cBullet = bulletArray.get(i);
 			g.setColor(cBullet.color);
-			g.fillRect((int)cBullet.x, (int)cBullet.y, cBullet.width, cBullet.height);
+			g.fillRect((int)cBullet.x - ((cBullet.width - 1) / 2), (int)cBullet.y - ((cBullet.height - 1) / 2), cBullet.width ,cBullet.height);
 		}
 	}
 	public void drawTargets(Graphics g){
@@ -171,8 +174,8 @@ public class GamePanel extends JPanel implements KeyListener{
 		}
 	}
 	public void drawAliens(Graphics g){
-		for(int i = 0; i < enemyArray.size(); i ++){
-			cAlien = enemyArray.get(i);
+		for(int i = 0; i < alienArray.size(); i ++){
+			cAlien = alienArray.get(i);
 			g.setColor(cAlien.color);
 			g.fillRect((int)cAlien.x - ((cAlien.width - 1) / 2), (int)cAlien.y - ((cAlien.height - 1) / 2), cAlien.width ,cAlien.height);
 		}
@@ -190,13 +193,13 @@ public class GamePanel extends JPanel implements KeyListener{
 	public void moveTargets() {
 		for(int i = 0; i < targetArray.size(); i++){
 			cTarget = targetArray.get(i);
-			cTarget.updateTarget(enemyArray);
+			cTarget.updateTarget(alienArray);
 			cTarget.moveAI();
 		}
 	}
 	public void moveAliens(){
-		for(int i = 0; i < enemyArray.size(); i ++){
-			cAlien = enemyArray.get(i);
+		for(int i = 0; i < alienArray.size(); i ++){
+			cAlien = alienArray.get(i);
 			ArrayList<Entity> tempArray = new ArrayList<Entity>();
 			tempArray.addAll(playerArray);
 			tempArray.addAll(targetArray);
@@ -220,11 +223,11 @@ public class GamePanel extends JPanel implements KeyListener{
 		ArrayList<Entity> tempArray = new ArrayList<Entity>();
 		tempArray.addAll(playerArray);
 		tempArray.addAll(targetArray);
-		for(int i = 0; i < enemyArray.size(); i ++){
-			cAlien = enemyArray.get(i);
+		for(int i = 0; i < alienArray.size(); i ++){
+			cAlien = alienArray.get(i);
 			for(int j = 0; j < tempArray.size(); j++){
 				cEntity = tempArray.get(j);
-				if(cEntity.dead == false){
+				if(!cEntity.dead && !cAlien.dead){
 					if(GameMath.getDistance(cAlien, cEntity) < ((cAlien.width + 1) / 2) + ((cEntity.width + 1) / 2)){
 						cEntity.onCollision();
 						effectParticleArray.addAll(cEntity.onDeath());
@@ -233,12 +236,12 @@ public class GamePanel extends JPanel implements KeyListener{
 				
 			}
 		}
-		tempArray.addAll(enemyArray);
+		tempArray.addAll(alienArray);
 		for(int i = 0; i < bulletArray.size(); i++){
 			cBullet = bulletArray.get(i);
 			for(int j = 0; j < tempArray.size(); j++){
 				cEntity = tempArray.get(j);
-				if(!cEntity.dead){
+				if(!cEntity.dead && !cBullet.dead){
 					if(GameMath.getDistance(cBullet, cEntity) < ((cBullet.width + 1) / 2) + ((cEntity.width + 1) / 2)){
 						cEntity.onCollision();
 						effectParticleArray.addAll(cEntity.onDeath());
@@ -248,7 +251,7 @@ public class GamePanel extends JPanel implements KeyListener{
 			}
 		}
 	}
-	public boolean checkAllDead(){
+	public boolean checkGameLose(){
 		for(int i = 0; i < playerArray.size();i++){
 			if(playerArray.get(i).dead == false){
 				return false;
@@ -256,6 +259,18 @@ public class GamePanel extends JPanel implements KeyListener{
 		}
 		for(int i = 0; i < targetArray.size(); i++){
 			if(targetArray.get(i).dead == false){
+				return false;
+			}
+		}
+		return true;
+	}
+	public boolean checkGameWin(){
+		ArrayList<Entity> tempArray = new ArrayList<Entity>();
+		tempArray.addAll(alienArray);
+		tempArray.addAll(mineArray);
+		tempArray.addAll(bulletArray);
+		for(int i = 0; i < tempArray.size();i++){
+			if(tempArray.get(i).dead == false){
 				return false;
 			}
 		}

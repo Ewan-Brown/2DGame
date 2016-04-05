@@ -20,7 +20,7 @@ public class Alien extends EntityAI {
 		this.color = Color.red;
 		this.speed = 1;
 	}
-
+	//TODO ALIEN LOCKS ONTO TARGET ENTITIES AND WONT CHANGE?
 	public void updateTarget(ArrayList<Entity> friendlyArray) {
 		double targets = friendlyArray.size();
 		double dist;
@@ -56,7 +56,8 @@ public class Alien extends EntityAI {
 		return bArray;
 	}
 	public ArrayList<? extends Particle> onDeath(){
-		return Effects.fireworks(Effects.explode(x, y, this.color));
+//		return Effects.fireworks(Effects.explode(x, y, this.color));
+		return Effects.implode(x, y, this.color);
 	}
 	public void moveAI() {
 		super.moveAI();
