@@ -19,5 +19,13 @@ public class GameMath {
 		angle = Math.atan2(x, y);
 		return angle;
 	}
+	public static boolean doCollide(Entity e1, Entity e2){
+		double dist = getDistance(e1,e2);
+		double deltaX = Math.abs(e1.x - e2.x);
+		double deltaY = Math.abs(e1.y - e2.y);
+		
+		
+		return false;
+	}
 	
 }

@@ -35,7 +35,7 @@ public class GamePanel extends JPanel implements KeyListener{
 	Target cTarget;
 	Bullet cBullet;
 	LandMine cMine;
-	int aliens = 1;
+	int aliens = 5;
 	int panelWidth;
 	int panelHeight;
 	public enum Direction{Left,Right,Up,Down};
@@ -66,6 +66,7 @@ public class GamePanel extends JPanel implements KeyListener{
 		this.setBackground(Color.BLACK);
 	}
 	public void startGame(){
+		aliens += 1;
 		bulletArray.clear();
 		alienArray.clear();
 		playerArray.clear();
@@ -74,7 +75,7 @@ public class GamePanel extends JPanel implements KeyListener{
 		player2 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.BLUE);
 		for(int i = 0; i < aliens; i++){
 			spawnAlien();
-//			mineArray.add(new LandMine(panelWidth,panelHeight,100,100));
+			mineArray.add(new LandMine(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 			spawnTarget();
 		}
 		playerArray.add(player1);
@@ -131,6 +132,8 @@ public class GamePanel extends JPanel implements KeyListener{
 		drawMines(g2);
 		drawBullets(g2);
 		drawEffects(g2);
+		g.setColor(Color.white);
+//		g.drawString(alienArray.size()+bulletArray.size()+mineArray.size()+"", panelWidth / 2, panelHeight / 2);
 		g2.setColor(Color.BLACK);
 //		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
 //    		RenderingHints.VALUE_TEXT_ANTIALIAS_ON);

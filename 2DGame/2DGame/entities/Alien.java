@@ -20,20 +20,21 @@ public class Alien extends EntityAI {
 		this.color = Color.red;
 		this.speed = 1;
 	}
-	//TODO ALIEN LOCKS ONTO TARGET ENTITIES AND WONT CHANGE?
 	public void updateTarget(ArrayList<Entity> friendlyArray) {
-		double targets = friendlyArray.size();
 		double dist;
 		double prevDist = 9999;
-		for(int i = 0; i < targets; i++){
+		for(int i = 0; i < friendlyArray.size(); i++){
 			if(friendlyArray.get(i).dead == false){
 				dist = GameMath.getDistance(this, friendlyArray.get(i));
 				if(dist < prevDist){
 					target = friendlyArray.get(i);
+					prevDist = dist;
 				}
-				prevDist = dist;
 			}
 		}
+	}
+	public double distToTarget(){
+		return GameMath.getDistance(this, target);
 	}
 	public ArrayList<Bullet> tryShoot(){
 		ArrayList<Bullet> bArray = new ArrayList<Bullet>();

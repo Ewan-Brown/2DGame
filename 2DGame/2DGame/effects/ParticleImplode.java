@@ -20,10 +20,10 @@ public class ParticleImplode extends Particle{
 			return;
 		}
 		//TODO HOLY CRAP THIS ONE IS COOl
-//		this.speedX -= antiX + speedX / 100;
-//		this.speedY -= antiY + speedX / 100;		
-		this.speedX -= antiX;
-		this.speedY -= antiY;	
+		this.speedX -= antiX + speedX / 100;
+		this.speedY -= antiY + speedX / 100;		
+//		this.speedX -= antiX;
+//		this.speedY -= antiY;	
 		this.x += speedX;
 		this.y += speedY;
 		if(this.x > main.Main.w || this.x < 0){

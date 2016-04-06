@@ -11,8 +11,8 @@ import entities.Entity;
 public class Main{
 	static GamePanel panel;
 	static JFrame frame;
-	public static int w = 1000;
-	public static int h = 1000;
+	public static int w = 1920;
+	public static int h = 1080;
 	int speed = 1;
 	Dimension preferredSize;
 	static Main main;

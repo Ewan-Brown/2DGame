@@ -12,7 +12,7 @@ public class Target extends EntityAI{
 	boolean sX,sY;
 	public Target(int width, int height, int x, int y) {
 		super(width, height, x, y);
-		this.color = Color.YELLOW;
+		this.color = Color.WHITE;
 	}
 	public void updateTarget(ArrayList<Alien> alienArray) {
 		double targets = alienArray.size();

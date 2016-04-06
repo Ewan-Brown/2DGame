@@ -1,7 +1,7 @@
 package entities;
 
 public class EntityAI extends Entity{
-	Entity target;
+	public Entity target;
 	double angle;
 	double deltaX,deltaY;
 

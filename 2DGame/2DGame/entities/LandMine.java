@@ -1,5 +1,6 @@
 package entities;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -10,6 +11,7 @@ public class LandMine extends Entity{
 
 	public LandMine(int width, int height, int x, int y) {
 		super(width, height, x, y);
+		this.color = Color.MAGENTA;
 	}
 	public void tick(){
 		timer--;
