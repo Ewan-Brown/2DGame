@@ -75,11 +75,13 @@ public class GamePanel extends JPanel implements KeyListener{
 		player2 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.BLUE);
 		for(int i = 0; i < aliens; i++){
 			spawnAlien();
-			mineArray.add(new LandMine(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 			spawnTarget();
 		}
 		playerArray.add(player1);
 		playerArray.add(player2);
+	}
+	public void spawnMine(){
+		mineArray.add(new LandMine(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 	}
 	public void spawnAlien(){
 		alienArray.add(new Alien(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));

@@ -24,7 +24,7 @@ public class LandMine extends Entity{
 		ArrayList<Bullet> p = new ArrayList<Bullet>();
 		Random rand = new Random();
 		for(int i = 0; i < bullets; i++){
-			p.add(new Bullet(MAX_X,MAX_Y,(int)x,(int)y,(rand.nextDouble() - 0.5) * 4,(rand.nextDouble() - 0.5) * 4));
+			p.add(new Bullet(MAX_X,MAX_Y,(int)x,(int)y,(rand.nextDouble() - 0.5) * 3 + 1,(rand.nextDouble() - 0.5) * 3 + 1));
 		}
 
 		return p;
