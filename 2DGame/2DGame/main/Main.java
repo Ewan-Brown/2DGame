@@ -1,12 +1,8 @@
 package main;
 
 import java.awt.Dimension;
-import java.util.ArrayList;
 
 import javax.swing.JFrame;
-
-import effects.Particle;
-import entities.Entity;
 
 public class Main{
 	static GamePanel panel;

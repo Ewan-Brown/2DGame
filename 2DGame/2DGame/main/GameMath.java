@@ -20,7 +20,6 @@ public class GameMath {
 		return angle;
 	}
 	public static boolean doCollide(Entity e1, Entity e2){
-		double dist = getDistance(e1,e2);
 		double deltaX = Math.abs(e1.x - e2.x);
 		double deltaY = Math.abs(e1.y - e2.y);
 		if(deltaX < (e1.width + e2.width) / 2 && deltaY < (e1.height + e2.height) / 2){

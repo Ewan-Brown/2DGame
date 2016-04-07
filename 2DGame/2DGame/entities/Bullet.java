@@ -1,9 +1,6 @@
 package entities;
 
 import java.awt.Color;
-import java.util.ArrayList;
-
-import main.GameMath;
 
 public class Bullet extends EntityAI{
 

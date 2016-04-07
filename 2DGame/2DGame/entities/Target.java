@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import effects.Effects;
-import effects.ParticleImplode;
 import effects.ParticleSwirly;
 import main.GameMath;
 

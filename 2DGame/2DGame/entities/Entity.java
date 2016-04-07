@@ -1,13 +1,10 @@
 package entities;
 
 import java.awt.Color;
-import java.awt.Graphics;
 import java.util.ArrayList;
 
 import effects.Particle;
 import main.GameMath;
-import main.GamePanel;
-import main.Main;
 
 public class Entity {
 
