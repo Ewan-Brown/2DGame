@@ -30,7 +30,6 @@ public class GamePanel extends JPanel implements KeyListener{
 	private static final long serialVersionUID = 1L;
 	double slideSpeed = 2;
 	Player player1;
-	Player player2;
 	//TODO GET RID OF ALL THESE 'c' TEMPORARY OBJECTS!
 	Alien cAlien;
 	Entity cEntity;
@@ -65,7 +64,6 @@ public class GamePanel extends JPanel implements KeyListener{
 		panelWidth = w;
 		panelHeight = h;
 		player1 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.GREEN,controls[0]);
-		player2 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.BLUE,controls[1]);
 		startGame();
 		this.setBackground(Color.BLACK);
 	}
@@ -76,14 +74,12 @@ public class GamePanel extends JPanel implements KeyListener{
 		playerArray.clear();
 		targetArray.clear();
 		player1.respawn(panelWidth / 2, panelHeight / 2);
-		player2.respawn(panelWidth / 2, panelHeight / 2);
 
 		for(int i = 0; i < aliens; i++){
 			spawnAlien();
 			spawnTarget();
 		}
 		playerArray.add(player1);
-		playerArray.add(player2);
 	}
 	public void spawnMine(){
 		mineArray.add(new LandMine(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
@@ -98,7 +94,6 @@ public class GamePanel extends JPanel implements KeyListener{
 		updateEffects();
 //		doKeyActions();
 		player1.updateControls(keySet);
-		player2.updateControls(keySet);
 		updateMines();
 		updateAliens();
 		updateTargets();

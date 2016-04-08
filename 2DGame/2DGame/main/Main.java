@@ -11,6 +11,7 @@ import javax.swing.KeyStroke;
 import settings.ControlSet;
 
 public class Main{
+	//Todo Finished sword code, just need to render it now? - should sword be diagonal too?
 	static GamePanel panel;
 	static JFrame frame;
 	public static int w = 1900;
@@ -31,13 +32,12 @@ public class Main{
 	public static void updateControls() throws IOException{
 		List<String> text = TextFileReader.readFile("Controls.text");
 		int lineNum = 0;
-		int[] keys = new int[7];
+		int[] keys = new int[11];
 		KeyStroke stroke;
-		for(int i = 0; i < 2; i++){
-			for(int j = 0; j < 7;j++){
+		for(int i = 0; i < 1; i++){
+			for(int j = 0; j < 11;j++){
 				stroke = KeyStroke.getKeyStroke(text.get(lineNum));
 				keys[j] = stroke.getKeyCode();
-				System.out.println(stroke);
 				lineNum++;
 			}
 			controls[i] = new ControlSet(keys);

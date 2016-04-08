@@ -10,10 +10,12 @@ public class ControlSet {
 	double speed = 0.1;
 	int cooldown = 20;
 	final int BASE_COOL = 20;
+	int shootUpKey,shootLeftKey,shootDownKey,shootRightKey;
 	
-	boolean up,left,down,right;
+	boolean up,down,left,right;
 	boolean sprint;
 	boolean faster,slower;
+	boolean sUp,sLeft,sDown,sRight;
 	
 //	public ControlSet(int up, int down, int left, int right, int sprint, int faster,int slower){
 //		this.upKey = up;
@@ -32,6 +34,10 @@ public class ControlSet {
 		this.fasterKey = keys[4];
 		this.slowerKey = keys[5];
 		this.sprintKey = keys[6];
+		this.shootUpKey = keys[7];
+		this.shootDownKey = keys[8];
+		this.shootLeftKey = keys[9];
+		this.shootUpKey = keys[10];
 	}
 	public void updateKeys(BitSet bitset){
 		cooldown--;
@@ -61,10 +67,10 @@ public class ControlSet {
 	public double getX(){
 		double x = 0;
 		if(left){
-			x = -1;
+			x -= 1;
 		}
 		if(right){
-			x = 1;
+			x += 1;
 		}
 		if(sprint){
 			x *= 2;
@@ -74,14 +80,35 @@ public class ControlSet {
 	public double getY(){
 		double y = 0;
 		if(up){
-			y = 1;
+			y += 1;
 		}
 		if(down){
-			y = -1;
+			y -= 1;
 		}
 		if(sprint){
 			y *= 2;
 		}
 		return y * speed;
 	}
+	public double getSwordX(){
+		double x = 0;
+		if(sRight){
+			x += 1;
+		}
+		if(sLeft){
+			x -= 1;
+		}
+		return x;
+	}
+	public double getSwordY(){
+		double y = 0;
+		if(sUp){
+			y += 1;
+		}
+		if(sDown){
+			y -= 1;
+		}
+		return y;
+	}
+	
 }
