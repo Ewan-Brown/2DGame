@@ -1,12 +1,14 @@
 package entities;
 
+import java.awt.Color;
+
 public class EntityAI extends Entity{
 	public Entity target;
 	double angle;
-	double deltaX,deltaY;
+	public double deltaX,deltaY;
 
-	public EntityAI(int width, int height, int x, int y) {
-		super(width, height, x, y);
+	public EntityAI(int width, int height, int x, int y,Color c) {
+		super(width, height, x, y,c);
 		speed = 1.0;
 		// TODO Auto-generated constructor stub
 	}

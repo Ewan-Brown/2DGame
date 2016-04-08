@@ -10,8 +10,7 @@ import main.GameMath;
 public class Target extends EntityAI{
 	boolean sX,sY;
 	public Target(int width, int height, int x, int y) {
-		super(width, height, x, y);
-		this.color = Color.WHITE;
+		super(width, height, x, y,Color.white);
 	}
 	public void updateTarget(ArrayList<Alien> alienArray) {
 		double targets = alienArray.size();
@@ -28,7 +27,9 @@ public class Target extends EntityAI{
 		}
 	}
 	public ArrayList<ParticleSwirly> onDeath(){
-		return Effects.swirlyParticle(this.x, this.y, this.color);
+		Color c = color;
+		this.deadColor();
+		return Effects.swirlyParticle(this.x, this.y, c);
 
 	}
 	public void moveAI(){

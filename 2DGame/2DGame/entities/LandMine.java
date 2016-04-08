@@ -10,8 +10,7 @@ public class LandMine extends Entity{
 	int bullets = 15;
 
 	public LandMine(int width, int height, int x, int y) {
-		super(width, height, x, y);
-		this.color = Color.MAGENTA;
+		super(width, height, x, y,Color.MAGENTA);
 	}
 	public void tick(){
 		timer--;

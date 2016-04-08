@@ -6,6 +6,10 @@ import java.util.Random;
 
 public class Effects {
 
+	//TODO incorporate an enum so that it's easier to differ tham and looks cool
+	public static enum particleType{
+		EXPLODE,SWIRLY,FIREWORKS,IMPLODE,FLIP;
+	}
 	public static ArrayList<Particle> explode(double x, double y, Color c){
 		int pNum = 100;
 		Random rand = new Random();
@@ -59,6 +63,17 @@ public class Effects {
 		ArrayList<ParticleSpiral> pArray = new ArrayList<ParticleSpiral>();
 		for(int i = 0; i < pNum; i ++){
 			pArray.add(new ParticleSpiral(x,y,(rand.nextDouble() * speed) - (speed / 2),(rand.nextDouble() * speed) - speed / 2,c));
+		}
+		return pArray;
+		
+	}
+	public static ArrayList<ParticleFlip> flip(double x, double y, Color c){
+		int pNum = 100;
+		Random rand = new Random();
+		int speed = 20;
+		ArrayList<ParticleFlip> pArray = new ArrayList<ParticleFlip>();
+		for(int i = 0; i < pNum; i ++){
+			pArray.add(new ParticleFlip(x,y,(rand.nextDouble() * speed) - (speed / 2),(rand.nextDouble() * speed) - speed / 2,c));
 		}
 		return pArray;
 		

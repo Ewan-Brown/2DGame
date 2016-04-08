@@ -1,8 +1,14 @@
 package main;
 
 import java.awt.Dimension;
+import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.KeyStroke;
+
+import settings.ControlSet;
 
 public class Main{
 	static GamePanel panel;
@@ -12,14 +18,32 @@ public class Main{
 	int speed = 1;
 	Dimension preferredSize;
 	static Main main;
+	static ControlSet[] controls = new ControlSet[2];
 	public static void main(String[] args){
+		try {
+			updateControls();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		start();
-//		r is the radius of the circle
-//		w = 2 * pi * f, where f is the frequency of the rotation
-//		t is the time (s) 
-//		
-//		x = r * sin(w*t);
-//		y = r * cos(w*t);
+	}
+	public static void updateControls() throws IOException{
+		List<String> text = TextFileReader.readFile("Controls.text");
+		int lineNum = 0;
+		int[] keys = new int[7];
+		KeyStroke stroke;
+		for(int i = 0; i < 2; i++){
+			for(int j = 0; j < 7;j++){
+				stroke = KeyStroke.getKeyStroke(text.get(lineNum));
+				keys[j] = stroke.getKeyCode();
+				System.out.println(stroke);
+				lineNum++;
+			}
+			controls[i] = new ControlSet(keys);
+		}
+		
+		
 	}
 	public static void gameLoop(){
 		//TODO Increase framerate but keep gamespeed?!?!
@@ -35,7 +59,7 @@ public class Main{
 	}
 	public static void start(){
 		frame = new JFrame("2D Game");
-		panel = new GamePanel(w,h);
+		panel = new GamePanel(w,h,controls);
 		frame.add(panel);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

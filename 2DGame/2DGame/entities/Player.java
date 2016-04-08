@@ -1,27 +1,38 @@
 package entities;
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.BitSet;
 
 import effects.Effects;
 import effects.ParticleImplode;
+import settings.ControlSet;
 
 public class Player extends Entity{
 	public boolean sprint;
-	public Player(int width, int height,int x, int y,Color c) {
-		super(width,height,x,y);
+	public ControlSet controls;
+	public Player(int width, int height,int x, int y,Color c,ControlSet controls) {
+		super(width,height,x,y,c);
+		this.controls = controls;
 		name = "PLAYER";
-		this.color = c;
 	}
 	public void moveEntity(double x, double y){
 		if(sprint){
 			speed *= 2;
 		}
+//		System.out.println(x+" "+y);
 		super.moveEntity(x, y);
 	}
 	public ArrayList<ParticleImplode> onDeath(){
-		return Effects.implode(this.x, this.y, this.color);
+		Color c = color;
+		this.deadColor();
+		return Effects.implode(this.x, this.y, c);
 
+	}
+	public void updateControls(BitSet bitset){
+		controls.updateKeys(bitset);
+		moveEntity(controls.getX(),controls.getY());
 	}
 
 }

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import entities.Entity;
 import entities.LandMine;
 import entities.Player;
 import entities.Target;
+import settings.ControlSet;
 
 public class GamePanel extends JPanel implements KeyListener{
 
@@ -35,7 +37,7 @@ public class GamePanel extends JPanel implements KeyListener{
 	Target cTarget;
 	Bullet cBullet;
 	LandMine cMine;
-	int aliens = 5;
+	int aliens = -1;
 	int panelWidth;
 	int panelHeight;
 	public enum Direction{Left,Right,Up,Down};
@@ -55,13 +57,15 @@ public class GamePanel extends JPanel implements KeyListener{
 	public ArrayList<LandMine> mineArray = new ArrayList<LandMine>();
 	Particle cParticle;
 	Random rand;
-	public GamePanel(int w, int h){
+	public GamePanel(int w, int h,ControlSet controls[]){
 		rand = new Random();
 		setPreferredSize(new Dimension(w,h));
 		this.setFocusable(true);
 		addKeyListener(this);
 		panelWidth = w;
 		panelHeight = h;
+		player1 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.GREEN,controls[0]);
+		player2 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.BLUE,controls[1]);
 		startGame();
 		this.setBackground(Color.BLACK);
 	}
@@ -71,8 +75,9 @@ public class GamePanel extends JPanel implements KeyListener{
 		alienArray.clear();
 		playerArray.clear();
 		targetArray.clear();
-		player1 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.GREEN);
-		player2 = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.BLUE);
+		player1.respawn(panelWidth / 2, panelHeight / 2);
+		player2.respawn(panelWidth / 2, panelHeight / 2);
+
 		for(int i = 0; i < aliens; i++){
 			spawnAlien();
 			spawnTarget();
@@ -91,11 +96,13 @@ public class GamePanel extends JPanel implements KeyListener{
 	}
 	public void update(){
 		updateEffects();
-		doKeyActions();
+//		doKeyActions();
+		player1.updateControls(keySet);
+		player2.updateControls(keySet);
 		updateMines();
-		moveAliens();
-		moveTargets();
-		moveBullets();
+		updateAliens();
+		updateTargets();
+		updateBullets();
 		checkCollisions();
 		if(checkGameLose()){
 			startGame();
@@ -115,16 +122,6 @@ public class GamePanel extends JPanel implements KeyListener{
 			}
 		}
 	}
-	public void getKeys(){
-		i = keySet.get(KeyEvent.VK_I);
-		j = keySet.get(KeyEvent.VK_J);
-		k = keySet.get(KeyEvent.VK_K);
-		l = keySet.get(KeyEvent.VK_L);
-		w = keySet.get(KeyEvent.VK_W);
-		a = keySet.get(KeyEvent.VK_A);
-		s = keySet.get(KeyEvent.VK_S);
-		d = keySet.get(KeyEvent.VK_D);
-	}
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D) g;
@@ -135,12 +132,25 @@ public class GamePanel extends JPanel implements KeyListener{
 		drawBullets(g2);
 		drawEffects(g2);
 		g.setColor(Color.white);
-//		g.drawString(alienArray.size()+bulletArray.size()+mineArray.size()+"", panelWidth / 2, panelHeight / 2);
+		g.drawString(enemiesAlive()+"", panelWidth / 2, panelHeight / 2);
 		g2.setColor(Color.BLACK);
-//		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-//    		RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-//	    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-//	    		RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+    		RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+	    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+	    		RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+	}
+	public int enemiesAlive(){
+		int a = 0;
+		ArrayList<Entity> tempArray = new ArrayList<Entity>();
+		tempArray.addAll(alienArray);
+		tempArray.addAll(mineArray);
+		tempArray.addAll(bulletArray);
+		for(int i = 0; i < tempArray.size(); i++){
+			if(tempArray.get(i).dead == false){
+				a++;
+			}
+		}
+		return a;
 	}
 	public void drawEffects(Graphics g){
 		for(int i = 0; i < effectParticleArray.size();i++){
@@ -195,14 +205,14 @@ public class GamePanel extends JPanel implements KeyListener{
 			}
 		}
 	}
-	public void moveTargets() {
+	public void updateTargets() {
 		for(int i = 0; i < targetArray.size(); i++){
 			cTarget = targetArray.get(i);
 			cTarget.updateTarget(alienArray);
 			cTarget.moveAI();
 		}
 	}
-	public void moveAliens(){
+	public void updateAliens(){
 		for(int i = 0; i < alienArray.size(); i ++){
 			cAlien = alienArray.get(i);
 			ArrayList<Entity> tempArray = new ArrayList<Entity>();
@@ -215,7 +225,7 @@ public class GamePanel extends JPanel implements KeyListener{
 			
 		}
 	}
-	public void moveBullets(){
+	public void updateBullets(){
 		for(int i = 0; i < bulletArray.size(); i++){
 			cBullet = bulletArray.get(i);
 			cBullet.moveAI();
@@ -287,92 +297,12 @@ public class GamePanel extends JPanel implements KeyListener{
 	
 	public void keyPressed(KeyEvent e) {
 		keySet.set(e.getKeyCode());
+		System.out.println(e);
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
 		keySet.clear(e.getKeyCode());
 
-	}
-	public void doKeyActions(){
-		speedShiftCount++;
-		getKeys();
-		if(keySet.get(KeyEvent.VK_Q)){
-			if(speedShiftCount > 30){
-				speedShiftCount = 0;
-				if(playerSpeedControl < 30){
-					playerSpeedControl += 1;
-				}
-			}
-		}
-		if(keySet.get(KeyEvent.VK_E)){
-			if(speedShiftCount > 30){
-				speedShiftCount = 0;
-				if(playerSpeedControl > 1){
-					playerSpeedControl -= 1;
-				}
-			}
-		}
-		speedShiftCount2++;
-		if(keySet.get(KeyEvent.VK_U)){
-			if(speedShiftCount2 > 30){
-				speedShiftCount2 = 0;
-				if(player2SpeedControl < 30){
-					player2SpeedControl += 1;
-				}
-			}
-		}
-		if(keySet.get(KeyEvent.VK_O)){
-			if(speedShiftCount2 > 30){
-				speedShiftCount2 = 0;
-				if(player2SpeedControl > 1){
-					player2SpeedControl -= 1;
-				}
-			}
-		}
-		if(keySet.get(KeyEvent.VK_SHIFT)){
-			player1.sprint = true;
-		}
-		else{
-			player1.sprint = false;
-		}
-		if(keySet.get(KeyEvent.VK_SLASH)){
-			player2.sprint = true;
-		}
-		else{
-			player2.sprint = false;
-		}
-		double x = 0;
-		double y = 0;
-		double x2 = 0;
-		double y2 = 0;
-		if(w){
-			y += 1;
-		}
-		if(s){
-			y -= 1;
-		}
-		if(a){
-			x -= 1;
-		}
-		if(d){
-			x += 1;
-		}
-		if(i){
-			y2 += 1;
-		}
-		if(k){
-			y2 -= 1;
-		}
-		if(j){
-			x2 -= 1;
-		}
-		if(l){
-			x2 += 1;
-		}
-		player1.speed = this.playerSpeedControl;
-		player2.speed = this.player2SpeedControl;
-		player1.moveEntity(x, y);
-		player2.moveEntity(x2, y2);
 	}
 
 }
