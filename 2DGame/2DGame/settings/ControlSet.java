@@ -1,13 +1,16 @@
 package settings;
 
+import java.awt.Point;
 import java.util.BitSet;
+
+import main.GameMath;
 
 public class ControlSet {
 	
 	int upKey,leftKey,downKey,rightKey;
 	int sprintKey;
 	int fasterKey,slowerKey;
-	double speed = 0.1;
+	double speed = 1;
 	int cooldown = 20;
 	final int BASE_COOL = 20;
 	int shootUpKey,shootLeftKey,shootDownKey,shootRightKey;
@@ -17,15 +20,6 @@ public class ControlSet {
 	boolean faster,slower;
 	boolean sUp,sLeft,sDown,sRight;
 	
-//	public ControlSet(int up, int down, int left, int right, int sprint, int faster,int slower){
-//		this.upKey = up;
-//		this.leftKey = left;
-//		this.rightKey = right; 
-//		this.downKey = down;
-//		this.sprintKey = sprint;
-//		this.fasterKey = faster;
-//		this.slowerKey = slower;
-//	}
 	public ControlSet(int[] keys){
 		this.upKey = keys[0];
 		this.leftKey = keys[1];
@@ -37,7 +31,7 @@ public class ControlSet {
 		this.shootUpKey = keys[7];
 		this.shootDownKey = keys[8];
 		this.shootLeftKey = keys[9];
-		this.shootUpKey = keys[10];
+		this.shootRightKey = keys[10];
 	}
 	public void updateKeys(BitSet bitset){
 		cooldown--;
@@ -48,6 +42,12 @@ public class ControlSet {
 		sprint = bitset.get(sprintKey);
 		faster = bitset.get(fasterKey);
 		slower = bitset.get(slowerKey);
+		sUp = bitset.get(shootUpKey);
+		sDown = bitset.get(shootDownKey);
+		sLeft = bitset.get(shootLeftKey);
+		sRight = bitset.get(shootRightKey);
+		//73,75,74,76
+		//73,74,75,76
 		if(cooldown == 0){
 			if(faster){
 				speed += 1;
@@ -90,25 +90,22 @@ public class ControlSet {
 		}
 		return y * speed;
 	}
-	public double getSwordX(){
+	public Point getSword(){
+		double y = 0;
 		double x = 0;
+		if(sUp){
+			y -= 1;
+		}
+		if(sDown){
+			y += 1;
+		}
 		if(sRight){
 			x += 1;
 		}
 		if(sLeft){
 			x -= 1;
 		}
-		return x;
-	}
-	public double getSwordY(){
-		double y = 0;
-		if(sUp){
-			y += 1;
-		}
-		if(sDown){
-			y -= 1;
-		}
-		return y;
+		return new Point((int)x,(int)y);
 	}
 	
 }

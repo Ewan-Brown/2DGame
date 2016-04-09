@@ -12,9 +12,9 @@ import settings.ControlSet;
 
 public class Main{
 	//Todo Finished sword code, just need to render it now? - should sword be diagonal too?
-	static GamePanel panel;
+	static Game panel;
 	static JFrame frame;
-	public static int w = 1900;
+	public static int w = 1000;
 	public static int h = 1000;
 	int speed = 1;
 	Dimension preferredSize;
@@ -59,7 +59,7 @@ public class Main{
 	}
 	public static void start(){
 		frame = new JFrame("2D Game");
-		panel = new GamePanel(w,h,controls);
+		panel = new Game(w,h,controls);
 		frame.add(panel);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

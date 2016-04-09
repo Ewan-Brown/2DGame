@@ -2,17 +2,19 @@ package entities;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.BitSet;
 
 import effects.Effects;
 import effects.ParticleImplode;
+import main.GameMath;
 import settings.ControlSet;
 
 public class Player extends Entity{
 	public boolean sprint;
 	public ControlSet controls;
-	int swordLength =  10;
+	int swordLength = 100;
 	public Player(int width, int height,int x, int y,Color c,ControlSet controls) {
 		super(width,height,x,y,c);
 		this.controls = controls;
@@ -37,15 +39,26 @@ public class Player extends Entity{
 	}
 	public Point getSwordPoint(){
 		Point p;
-		double sX,sY;
-		sX = this.x;
-		sY = this.y;
-		sX += controls.getSwordX() * 10;
-		sY += controls.getSwordY() * 10;
-		p = new Point();
-		p.x = (int)sX;
-		p.y = (int)sY;
-		return null;
+		p = controls.getSword();
+		if(!dead){
+			p.x *= swordLength;
+			p.y *= swordLength;
+			if(Math.abs(p.x) + Math.abs(p.y) == swordLength * 2){
+				p.x *= GameMath.SIN_OF_45;
+				p.y *= GameMath.SIN_OF_45;
+			}
+			p.x += this.x;
+			p.y += this.y;
+		}
+		else{
+			p.x = (int)x;
+			p.y = (int)y;
+		}
+		return p;
+	}
+	public Line2D getSwordLine(){
+		Point p = this.getSwordPoint();
+		return new Line2D.Double(p.x, p.y, x, y);
 	}
 
 }

@@ -4,9 +4,12 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Random;
@@ -22,7 +25,7 @@ import entities.Player;
 import entities.Target;
 import settings.ControlSet;
 
-public class GamePanel extends JPanel implements KeyListener{
+public class Game extends JPanel implements KeyListener{
 
 	/**
 	 * 
@@ -56,7 +59,7 @@ public class GamePanel extends JPanel implements KeyListener{
 	public ArrayList<LandMine> mineArray = new ArrayList<LandMine>();
 	Particle cParticle;
 	Random rand;
-	public GamePanel(int w, int h,ControlSet controls[]){
+	public Game(int w, int h,ControlSet controls[]){
 		rand = new Random();
 		setPreferredSize(new Dimension(w,h));
 		this.setFocusable(true);
@@ -126,6 +129,10 @@ public class GamePanel extends JPanel implements KeyListener{
 		drawMines(g2);
 		drawBullets(g2);
 		drawEffects(g2);
+		
+		g.setColor(player1.color);
+		Line2D sword = player1.getSwordLine();
+		g2.draw(sword);
 		g.setColor(Color.white);
 		g.drawString(enemiesAlive()+"", panelWidth / 2, panelHeight / 2);
 		g2.setColor(Color.BLACK);
@@ -217,7 +224,6 @@ public class GamePanel extends JPanel implements KeyListener{
 			cAlien.moveAI();
 			bulletArray.addAll(cAlien.tryShoot());
 			
-			
 		}
 	}
 	public void updateBullets(){
@@ -260,6 +266,19 @@ public class GamePanel extends JPanel implements KeyListener{
 				
 			}
 		}
+		tempArray.clear();
+		tempArray.addAll(alienArray);
+		tempArray.addAll(bulletArray);
+		Rectangle tempRectangle;
+		Line2D swordLine = player1.getSwordLine();
+		for(int i = 0; i < tempArray.size();i++){
+			cEntity = tempArray.get(i);
+			tempRectangle = new Rectangle((int)cEntity.x - ((cEntity.width - 1) / 2), (int)cEntity.y - ((cEntity.height - 1) / 2),cEntity.width,cEntity.height);
+			if(swordLine.intersects(tempRectangle)){
+				cEntity.onCollision();
+				effectParticleArray.addAll(cEntity.onDeath());
+			}
+		}
 	}
 	public boolean checkGameLose(){
 		for(int i = 0; i < playerArray.size();i++){
@@ -292,7 +311,6 @@ public class GamePanel extends JPanel implements KeyListener{
 	
 	public void keyPressed(KeyEvent e) {
 		keySet.set(e.getKeyCode());
-		System.out.println(e);
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
