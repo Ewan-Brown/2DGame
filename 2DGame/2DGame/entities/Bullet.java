@@ -10,8 +10,8 @@ public class Bullet extends EntityAI{
 	public Bullet(int width, int height, int x, int y, double dX, double dY) {
 		super(width, height, x, y,Color.PINK);
 		this.color = Color.PINK;
-		this.width = 2;
-		this.height = 2;
+		this.width = 3;
+		this.height = 3;
 		deltaX = dX;
 		deltaY = dY;
 		//Prevents shooter from being hit by own bullets!
@@ -29,6 +29,9 @@ public class Bullet extends EntityAI{
 		if(this.y > main.Main.h || this.y < 0){
 			this.dead = true;
 		}
+	}
+	public void onCollision(){
+		
 	}
 
 }

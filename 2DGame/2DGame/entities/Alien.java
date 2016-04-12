@@ -54,6 +54,7 @@ public class Alien extends EntityAI {
 		speedX = 2.0 * Math.cos(angle);
 		speedY = 2.0 * Math.sin(angle);
 		return new Bullet(MAX_X,MAX_Y,(int)x,(int)y,speedX,speedY);
+//		return null;
 	}
 	public ArrayList<Bullet> shotgun(){
 		ArrayList<Bullet> bArray = new ArrayList<Bullet>();
@@ -85,7 +86,6 @@ public class Alien extends EntityAI {
 		return new Bullet(MAX_X,MAX_Y,(int)x,(int)y,speedX,speedY);
 	}
 	public ArrayList<? extends Particle> onDeath(){
-//		return Effects.fireworks(Effects.explode(x, y, this.color));
 		Color c = color;
 		this.deadColor();
 		return Effects.flip(x, y,c);
@@ -95,6 +95,9 @@ public class Alien extends EntityAI {
 		this.x += deltaX;
 		this.y += deltaY;
 		checkWallCollision();
+	}
+	public void onCollision(){
+		this.dead = true;
 	}
 
 }

@@ -9,7 +9,6 @@ public class ParticleFlip extends ParticleImplode{
 		super(x, y, speedX, speedY, c);
 	}
 	public void update(){
-	
 		this.life -= 1;
 		if(life < 1){
 			dead = true;

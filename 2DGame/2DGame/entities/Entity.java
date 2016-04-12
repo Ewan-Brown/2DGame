@@ -64,7 +64,7 @@ public class Entity {
 	}
 	public void moveEntity(double x, double y){
 		if(!dead){
-			if(Math.abs(x) + Math.abs(y) == 2){
+			if(Math.abs(x) + Math.abs (y) == 2){
 				x *= GameMath.SIN_OF_45;
 				y *= GameMath.SIN_OF_45;
 			}

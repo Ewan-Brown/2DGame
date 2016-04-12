@@ -15,6 +15,7 @@ public class Player extends Entity{
 	public boolean sprint;
 	public ControlSet controls;
 	int swordLength = 100;
+	public Point lastClick = new Point(100,200);
 	public Player(int width, int height,int x, int y,Color c,ControlSet controls) {
 		super(width,height,x,y,c);
 		this.controls = controls;
@@ -59,6 +60,27 @@ public class Player extends Entity{
 	public Line2D getSwordLine(){
 		Point p = this.getSwordPoint();
 		return new Line2D.Double(p.x, p.y, x, y);
+	}
+	public void click(Point click){
+		this.lastClick = click;
+	}
+	public ArrayList<Bullet> shoot(){
+		ArrayList<Bullet> bArray = new ArrayList<Bullet>();
+		if(!dead){
+			if(lastClick == null){
+				return null;
+			}
+			double speedX = 0,speedY = 0,angle = 0;
+			angle = Math.atan2(lastClick.y - y, lastClick.x - x);
+			speedX = 2.0 * Math.cos(angle);
+			speedY = 2.0 * Math.sin(angle);
+			lastClick = null;
+			bArray.add(new Bullet(MAX_X,MAX_Y,(int)x,(int)y,speedX,speedY));
+		}
+		else{
+			bArray = null;
+		}
+		return bArray;
 	}
 
 }

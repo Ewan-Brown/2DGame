@@ -68,6 +68,7 @@ public class Effects {
 		
 	}
 	public static ArrayList<ParticleFlip> flip(double x, double y, Color c){
+		System.out.println("xxxx");
 		int pNum = 100;
 		Random rand = new Random();
 		int speed = 20;
