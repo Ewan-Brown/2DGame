@@ -312,17 +312,26 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			u = (e.y - (e.height - 1) / 2);
 			d = (e.y +(e.height - 1) / 2);
 			if(l < 0){
+				e.onWallCollide();
 				e.x = (e.width - 1) / 2;
-//				e.dead = true;
 			}
 			if(r > panelWidth){
+				e.onWallCollide();
 				e.x = panelWidth - (e.width - 1) / 2;
 			}
 			if(u < 0){
+				e.onWallCollide();
 				e.y = (e.height - 1) / 2;
 			}
 			if(d > panelHeight){
+				e.onWallCollide();
 				e.y = panelWidth - (e.height - 1) / 2;
+			}
+			for(Wall w : wallArray){
+				if(GameMath.doCollide(e, w)){
+					//TODO collision code here!
+					
+				}
 			}
 		}
 	}

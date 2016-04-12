@@ -19,7 +19,6 @@ public class Entity {
 	public boolean dead;
 	public Color color;
 	public Color baseColor;
-	public boolean wallCollide = true;
 	public Entity(int width, int height, int x, int y,Color c){
 		name = "NULL";
 		this.x = x;
@@ -71,5 +70,8 @@ public class Entity {
 			this.x += x * speed;
 			this.y -= y * speed;
 		}
+	}
+	public void onWallCollide(){
+		
 	}
 }
