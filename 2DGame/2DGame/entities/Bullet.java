@@ -9,6 +9,7 @@ public class Bullet extends EntityAI{
 	double deltaY;
 	public Bullet(int width, int height, int x, int y, double dX, double dY) {
 		super(width, height, x, y,Color.PINK);
+		wallCollide = false;
 		this.color = Color.PINK;
 		this.width = 3;
 		this.height = 3;
@@ -23,15 +24,6 @@ public class Bullet extends EntityAI{
 	public void moveAI(){
 		this.x += deltaX;
 		this.y += deltaY;
-		if(this.x > main.Main.w || this.x < 0){
-			this.dead = true;
-		}
-		if(this.y > main.Main.h || this.y < 0){
-			this.dead = true;
-		}
-	}
-	public void onCollision(){
-		
 	}
 
 }

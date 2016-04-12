@@ -25,6 +25,7 @@ import entities.Entity;
 import entities.LandMine;
 import entities.Player;
 import entities.Target;
+import entities.Wall;
 import settings.ControlSet;
 
 public class Game extends JPanel implements KeyListener,MouseListener{
@@ -35,7 +36,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	private static final long serialVersionUID = 1L;
 	double slideSpeed = 2;
 	Player player;
-	int aliens = 10;
+	int aliens = 1;
 	int panelWidth;
 	int panelHeight;
 	public enum Direction{Left,Right,Up,Down};
@@ -52,6 +53,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public ArrayList<Target> targetArray = new ArrayList<Target>();
 	public ArrayList<Bullet> bulletArray = new ArrayList<Bullet>();
 	public ArrayList<LandMine> mineArray = new ArrayList<LandMine>();
+	public ArrayList<Wall> wallArray = new ArrayList<Wall>();
 	Particle cParticle;
 	Random rand;
 	public Game(int w, int h,ControlSet controls[]){
@@ -63,8 +65,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		panelWidth = w;
 		panelHeight = h;
 		player = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.GREEN,controls[0]);
-		startGame();
 		this.setBackground(Color.BLACK);
+		startGame();
 	}
 	public void startGame(){
 		aliens += 1;
@@ -80,6 +82,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			spawnTarget();
 		}
 		playerArray.add(player);
+		wallArray.add(new Wall(panelWidth,panelHeight,100,100));
 	}
 	public void spawnMine(){
 		mineArray.add(new LandMine(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
@@ -126,6 +129,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		drawMines(g2);
 		drawBullets(g2);
 		drawEffects(g2);
+		drawWalls(g2);
+		checkObstacleCollisions();
 		g.setColor(player.color);
 		Line2D sword = player.getSwordLine();
 		g2.draw(sword);
@@ -187,6 +192,12 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		for(Alien cAlien : alienArray){
 			g.setColor(cAlien.color);
 			g.fillRect((int)cAlien.x - ((cAlien.width - 1) / 2), (int)cAlien.y - ((cAlien.height - 1) / 2), cAlien.width ,cAlien.height);
+		}
+	}
+	public void drawWalls(Graphics g){
+		for(Wall cWall : wallArray){
+			g.setColor(cWall.color);
+			g.fillRect((int)cWall.x - ((cWall.width - 1) / 2), (int)cWall.y - ((cWall.height - 1) / 2), cWall.width, cWall.height);
 		}
 	}
 	public void updateMines(){
@@ -287,6 +298,34 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			}
 		}
 	}
+	public void checkObstacleCollisions(){
+		ArrayList<Entity> allEntities = new ArrayList<Entity>();
+		allEntities.addAll(this.alienArray);
+		allEntities.addAll(this.bulletArray);
+		allEntities.addAll(this.mineArray);
+		allEntities.addAll(this.playerArray);
+		allEntities.addAll(this.targetArray);
+		double l,r,u,d;
+		for(Entity e : allEntities){
+			l = (e.x - (e.width - 1) / 2);
+			r = (e.x +(e.width - 1) / 2);
+			u = (e.y - (e.height - 1) / 2);
+			d = (e.y +(e.height - 1) / 2);
+			if(l < 0){
+				e.x = (e.width - 1) / 2;
+//				e.dead = true;
+			}
+			if(r > panelWidth){
+				e.x = panelWidth - (e.width - 1) / 2;
+			}
+			if(u < 0){
+				e.y = (e.height - 1) / 2;
+			}
+			if(d > panelHeight){
+				e.y = panelWidth - (e.height - 1) / 2;
+			}
+		}
+	}
 	public boolean checkGameLose(){
 		if(!player.dead){
 			return false;
@@ -333,6 +372,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	@Override
 	public void mouseEntered(MouseEvent e) {}
 	@Override
-	public void mouseExited(MouseEvent e) {}
+	public void mouseExited(MouseEvent e) {
+		keySet.clear();
+	}
 
 }

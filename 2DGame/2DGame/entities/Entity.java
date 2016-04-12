@@ -16,10 +16,10 @@ public class Entity {
 	int MAX_X;
 	int MAX_Y;
 	public double speed = 1;
-	double l,r,u,d;
 	public boolean dead;
 	public Color color;
 	public Color baseColor;
+	public boolean wallCollide = true;
 	public Entity(int width, int height, int x, int y,Color c){
 		name = "NULL";
 		this.x = x;
@@ -70,27 +70,6 @@ public class Entity {
 			}
 			this.x += x * speed;
 			this.y -= y * speed;
-		}
-		//TODO may want to move this?
-		this.checkWallCollision();
-	}
-	public void checkWallCollision(){
-		l = (this.x - (this.width - 1) / 2);
-		r = (this.x +(this.width - 1) / 2);
-		u = (this.y - (this.height - 1) / 2);
-		d = (this.y +(this.height - 1) / 2);
-		if(l < 0){
-			this.x = (this.width - 1) / 2;
-//			this.dead = true;
-		}
-		if(r > MAX_X){
-			this.x = MAX_X - (this.width - 1) / 2;
-		}
-		if(u < 0){
-			this.y = (this.height - 1) / 2;
-		}
-		if(d > MAX_Y){
-			this.y = MAX_Y - (this.height - 1) / 2;
 		}
 	}
 }

@@ -69,14 +69,12 @@ public class Alien extends EntityAI {
 		}
 		return bArray;
 	}
-	//TODO DOES NOT WORK
 	public Bullet shootSmart(){
 		double speedX,speedY;
 		double tX,tY;
 		tY = target.y;
 		tX = target.x;
 		if(target instanceof Target){
-			System.out.println("HEY");
 			tY += ((Target)target).deltaY * 30;
 			tX += ((Target) target).deltaY * 30;
 		}
@@ -94,7 +92,6 @@ public class Alien extends EntityAI {
 		super.moveAI();
 		this.x += deltaX;
 		this.y += deltaY;
-		checkWallCollision();
 	}
 	public void onCollision(){
 		this.dead = true;
