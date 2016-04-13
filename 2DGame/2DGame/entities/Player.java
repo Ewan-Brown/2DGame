@@ -15,11 +15,13 @@ public class Player extends Entity{
 	public boolean sprint;
 	public ControlSet controls;
 	int swordLength = 100;
-	public Point lastClick = new Point(100,200);
-	public Player(int width, int height,int x, int y,Color c,ControlSet controls) {
-		super(width,height,x,y,c);
+	public Point lastClick;
+	public Player(int x, int y,Color c,ControlSet controls) {
+		super(x,y,c);
 		this.controls = controls;
 		name = "PLAYER";
+		this.height = 10;
+		this.width = 10;
 	}
 	public void moveEntity(double x, double y){
 		if(sprint){
@@ -75,7 +77,7 @@ public class Player extends Entity{
 			speedX = 2.0 * Math.cos(angle);
 			speedY = 2.0 * Math.sin(angle);
 			lastClick = null;
-			bArray.add(new Bullet(MAX_X,MAX_Y,(int)x,(int)y,speedX,speedY));
+			bArray.add(new Bullet((int)x,(int)y,speedX,speedY));
 		}
 		else{
 			bArray = null;

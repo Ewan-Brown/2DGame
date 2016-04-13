@@ -7,8 +7,8 @@ public class EntityAI extends Entity{
 	double angle;
 	public double deltaX,deltaY;
 
-	public EntityAI(int width, int height, int x, int y,Color c) {
-		super(width, height, x, y,c);
+	public EntityAI(int x, int y,Color c) {
+		super(x, y,c);
 		speed = 1.0;
 		// TODO Auto-generated constructor stub
 	}

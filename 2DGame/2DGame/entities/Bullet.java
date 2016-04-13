@@ -7,8 +7,8 @@ public class Bullet extends EntityAI{
 	
 	double deltaX;
 	double deltaY;
-	public Bullet(int width, int height, int x, int y, double dX, double dY) {
-		super(width, height, x, y,Color.PINK);
+	public Bullet(int x, int y, double dX, double dY) {
+		super(x, y,Color.PINK);
 		this.color = Color.PINK;
 		this.width = 3;
 		this.height = 3;

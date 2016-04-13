@@ -13,19 +13,15 @@ public class Entity {
 	int health;
 	public int width = 10;
 	public int height = 10;
-	int MAX_X;
-	int MAX_Y;
 	public double speed = 1;
 	public boolean dead;
 	public Color color;
 	public Color baseColor;
-	public Entity(int width, int height, int x, int y,Color c){
+	public Entity(int x, int y,Color c){
 		name = "NULL";
 		this.x = x;
 		this.y = y;
 		this.health = 100;
-		this.MAX_X = width;
-		this.MAX_Y = height;
 		color = c;
 		baseColor = c;
 	}
@@ -73,5 +69,19 @@ public class Entity {
 	}
 	public void onWallCollide(){
 		
+	}
+
+	public double getLeftSide(){
+		return (this.x - (this.width - 1) / 2);
+	}
+	public double getRightSide(){
+		return (this.x +(this.width - 1) / 2);
+		
+	}
+	public double getUpSide(){
+		return (this.y - (this.height - 1) / 2);
+	}
+	public double getDownSide(){
+		return(this.y +(this.height - 1) / 2);
 	}
 }

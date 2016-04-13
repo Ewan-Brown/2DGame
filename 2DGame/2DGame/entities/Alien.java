@@ -16,8 +16,8 @@ public class Alien extends EntityAI {
 	final double SHOTGUN_CHOKE = 0.08;
 	final double SHOT_MULT = 0.1;
 
-	public Alien(int w, int h, int x, int y) {
-		super(w, h, x, y,Color.RED);
+	public Alien(int x, int y) {
+		super(x, y,Color.RED);
 		rand = new Random();
 		this.speed = 1;
 	}
@@ -53,7 +53,7 @@ public class Alien extends EntityAI {
 		angle = Math.atan2(target.y - y, target.x - x) + ((rand.nextDouble() - 0.5) * SHOT_MULT);
 		speedX = 2.0 * Math.cos(angle);
 		speedY = 2.0 * Math.sin(angle);
-		return new Bullet(MAX_X,MAX_Y,(int)x,(int)y,speedX,speedY);
+		return new Bullet((int)x,(int)y,speedX,speedY);
 //		return null;
 	}
 	public ArrayList<Bullet> shotgun(){
@@ -64,25 +64,26 @@ public class Alien extends EntityAI {
 		for(int i = 0; i < 3;i++){
 			speedX = 2.0 * Math.cos(angle);
 			speedY = 2.0 * Math.sin(angle);
-			bArray.add(new Bullet(MAX_X,MAX_Y,(int)x,(int)y,speedX,speedY));
+			bArray.add(new Bullet((int)x,(int)y,speedX,speedY));
 			angle += SHOTGUN_CHOKE;
 		}
 		return bArray;
 	}
-	public Bullet shootSmart(){
-		double speedX,speedY;
-		double tX,tY;
-		tY = target.y;
-		tX = target.x;
-		if(target instanceof Target){
-			tY += ((Target)target).deltaY * 30;
-			tX += ((Target) target).deltaY * 30;
-		}
-		angle = Math.atan2(tY - y, tX - x) + ((rand.nextDouble() - 0.5) * SHOT_MULT);
-		speedX = 2.0 * Math.cos(angle);
-		speedY = 2.0 * Math.sin(angle);
-		return new Bullet(MAX_X,MAX_Y,(int)x,(int)y,speedX,speedY);
-	}
+	//TODO smart Shooting DOESNT WORK
+//	public Bullet shootSmart(){
+//		double speedX,speedY;
+//		double tX,tY;
+//		tY = target.y;
+//		tX = target.x;
+//		if(target instanceof Target){
+//			tY += ((Target)target).deltaY * 30;
+//			tX += ((Target) target).deltaY * 30;
+//		}
+//		angle = Math.atan2(tY - y, tX - x) + ((rand.nextDouble() - 0.5) * SHOT_MULT);
+//		speedX = 2.0 * Math.cos(angle);
+//		speedY = 2.0 * Math.sin(angle);
+//		return new Bullet((int)x,(int)y,speedX,speedY);
+//	}
 	public ArrayList<? extends Particle> onDeath(){
 		Color c = color;
 		this.deadColor();

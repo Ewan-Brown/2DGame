@@ -12,6 +12,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Line2D;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Random;
@@ -34,9 +35,11 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	public final DecimalFormat df = new DecimalFormat("#.##");
 	double slideSpeed = 2;
 	Player player;
 	int aliens = 1;
+	int walls = 10;
 	int panelWidth;
 	int panelHeight;
 	public enum Direction{Left,Right,Up,Down};
@@ -64,34 +67,41 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		addMouseListener(this);
 		panelWidth = w;
 		panelHeight = h;
-		player = new Player(panelWidth, panelHeight, panelWidth / 2, panelHeight / 2,Color.GREEN,controls[0]);
+		player = new Player(panelWidth / 2, panelHeight / 2,Color.GREEN,controls[0]);
 		this.setBackground(Color.BLACK);
 		startGame();
 	}
 	public void startGame(){
 		aliens += 1;
 		keySet.clear();
+		wallArray.clear();
 		bulletArray.clear();
 		alienArray.clear();
 		playerArray.clear();
 		targetArray.clear();
 		player.respawn(panelWidth / 2, panelHeight / 2);
 
-		for(int i = 0; i < aliens; i++){
+		for(int i = 1; i < aliens; i++){
 			spawnAlien();
 			spawnTarget();
 		}
+		for(int i = 1; i < walls; i++){
+			spawnWall();
+		}
 		playerArray.add(player);
-		wallArray.add(new Wall(panelWidth,panelHeight,100,100));
+		keySet.clear();
+	}
+	public void spawnWall(){
+		wallArray.add(new Wall(rand.nextInt(panelWidth),rand.nextInt(panelHeight),rand.nextInt(100),rand.nextInt(100)));
 	}
 	public void spawnMine(){
-		mineArray.add(new LandMine(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
+		mineArray.add(new LandMine(rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 	}
 	public void spawnAlien(){
-		alienArray.add(new Alien(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
+		alienArray.add(new Alien(rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 	}
 	public void spawnTarget(){
-		targetArray.add(new Target(panelWidth,panelHeight,rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
+		targetArray.add(new Target(rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 	}
 	public void update(){
 		updateEffects();
@@ -102,11 +112,12 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		updateTargets();
 		updateBullets();
 		checkCollisions();
+		checkObstacleCollisions();
 		if(checkGameLose()){
 			startGame();
 		}
 		if(checkGameWin()){
-			startGame();
+//			startGame();
 		}
 		this.repaint();
 	}
@@ -130,7 +141,6 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		drawBullets(g2);
 		drawEffects(g2);
 		drawWalls(g2);
-		checkObstacleCollisions();
 		g.setColor(player.color);
 		Line2D sword = player.getSwordLine();
 		g2.draw(sword);
@@ -306,11 +316,14 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		allEntities.addAll(this.playerArray);
 		allEntities.addAll(this.targetArray);
 		double l,r,u,d;
+		double l2,r2,u2,d2;
+		int minIndex;
+		ArrayList<Double> overLap = new ArrayList<Double>();
 		for(Entity e : allEntities){
-			l = (e.x - (e.width - 1) / 2);
-			r = (e.x +(e.width - 1) / 2);
-			u = (e.y - (e.height - 1) / 2);
-			d = (e.y +(e.height - 1) / 2);
+			l = e.getLeftSide();
+			r = e.getRightSide();
+			u = e.getUpSide();
+			d = e.getDownSide();
 			if(l < 0){
 				e.onWallCollide();
 				e.x = (e.width - 1) / 2;
@@ -329,7 +342,39 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			}
 			for(Wall w : wallArray){
 				if(GameMath.doCollide(e, w)){
-					//TODO collision code here!
+					l2 = w.getLeftSide();
+					r2 = w.getRightSide();
+					u2 = w.getUpSide();
+					d2 = w.getDownSide();
+					if(e.y < w.y){
+						
+					}
+					else{
+						
+					}
+					if(e.x < w.x){
+						
+					}
+					else{
+						
+					}
+					
+//					if(Math.abs(e.x - w.x) > Math.abs(e.y - w.y)){
+//						if(e.x < w.x){
+//							e.x = l2 - (e.width - 1) / 2 - 2;
+//						}
+//						if(e.x > w.x){
+//							e.x = r2 + (e.width - 1) / 2 + 2;
+//						}
+//					}
+//					else{
+//						if(e.y < w.y){
+//							e.y = u2 - (e.height - 1) / 2 - 2;
+//						}
+//						if(e.y > w.y){
+//							e.y = d2 + (e.height - 1) / 2 + 2;
+//						}
+//					}
 					
 				}
 			}
