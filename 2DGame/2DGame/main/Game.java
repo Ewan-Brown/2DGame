@@ -342,6 +342,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			}
 			for(Wall w : wallArray){
 				if(GameMath.doCollide(e, w)){
+					e.onWallCollide();
 					l2 = w.getLeftSide();
 					r2 = w.getRightSide();
 					u2 = w.getUpSide();
