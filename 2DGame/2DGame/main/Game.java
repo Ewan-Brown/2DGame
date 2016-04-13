@@ -318,7 +318,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		double l,r,u,d;
 		double l2,r2,u2,d2;
 		int minIndex;
-		ArrayList<Double> overLap = new ArrayList<Double>();
+		ArrayList<Double> overLap = new ArrayList<Double>(4);
 		for(Entity e : allEntities){
 			l = e.getLeftSide();
 			r = e.getRightSide();
@@ -346,17 +346,27 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 					r2 = w.getRightSide();
 					u2 = w.getUpSide();
 					d2 = w.getDownSide();
-					if(e.y < w.y){
-						
+					overLap.add(0, Math.abs(l2 - r));
+					overLap.add(1, Math.abs(r2 - l));
+					overLap.add(2, Math.abs(u2 - d));
+					overLap.add(3, Math.abs(d2 - u));
+					minIndex = 0;
+					for(int i = 1; i < 4;i++){
+						if(overLap.get(i) < overLap.get(minIndex)){
+							minIndex = i;
+						}
 					}
-					else{
-						
+					if(minIndex == 0){
+						e.x = l2 - (e.width - 1) / 2 - 2;
 					}
-					if(e.x < w.x){
-						
+					if(minIndex == 1){
+						e.x = r2 + (e.width - 1) / 2 + 2;
 					}
-					else{
-						
+					if(minIndex == 2){
+						e.y = u2 - (e.height - 1) / 2 - 2;
+					}
+					if(minIndex == 3){
+						e.y = d2 + (e.height - 1) / 2 + 2;
 					}
 					
 //					if(Math.abs(e.x - w.x) > Math.abs(e.y - w.y)){
