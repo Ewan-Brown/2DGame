@@ -11,7 +11,9 @@ public class Effects {
 		EXPLODE,SWIRLY,FIREWORKS,IMPLODE,FLIP;
 	}
 	public static ArrayList<Particle> explode(double x, double y, Color c){
-		int pNum = 100;
+		return explode(x,y,c,100);
+	}
+	public static ArrayList<Particle> explode(double x, double y, Color c, int pNum){
 		Random rand = new Random();
 		int speed = 20;
 		ArrayList<Particle> pArray = new ArrayList<Particle>();
@@ -68,7 +70,6 @@ public class Effects {
 		
 	}
 	public static ArrayList<ParticleFlip> flip(double x, double y, Color c){
-		System.out.println("xxxx");
 		int pNum = 100;
 		Random rand = new Random();
 		int speed = 20;

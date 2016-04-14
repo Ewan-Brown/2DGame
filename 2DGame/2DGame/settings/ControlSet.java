@@ -1,6 +1,7 @@
 package settings;
 
 import java.awt.Point;
+import java.awt.event.KeyEvent;
 import java.util.BitSet;
 
 import main.GameMath;
@@ -14,6 +15,7 @@ public class ControlSet {
 	int cooldown = 20;
 	final int BASE_COOL = 20;
 	int shootUpKey,shootLeftKey,shootDownKey,shootRightKey;
+	int targetKey = KeyEvent.VK_TAB;
 	
 	boolean up,down,left,right;
 	boolean sprint;
@@ -60,7 +62,7 @@ public class ControlSet {
 		if(speed < 0.5){
 			speed = 0.5;
 		}
-		if(speed > 40){
+		if(speed > 20){
 			speed = 40;
 		}
 	}

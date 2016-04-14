@@ -16,6 +16,7 @@ public class Player extends Entity{
 	public ControlSet controls;
 	int swordLength = 100;
 	public Point lastClick;
+	public Entity target;
 	public Player(int x, int y,Color c,ControlSet controls) {
 		super(x,y,c);
 		this.controls = controls;
@@ -27,7 +28,6 @@ public class Player extends Entity{
 		if(sprint){
 			speed *= 2;
 		}
-//		System.out.println(x+" "+y);
 		super.moveEntity(x, y);
 	}
 	public ArrayList<ParticleImplode> onDeath(){

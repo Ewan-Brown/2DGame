@@ -38,6 +38,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public final DecimalFormat df = new DecimalFormat("#.##");
 	double slideSpeed = 2;
 	Player player;
+	public double safeSpawnDistance = 700;
 	int aliens = 1;
 	int walls = 10;
 	int panelWidth;
@@ -72,33 +73,47 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		startGame();
 	}
 	public void startGame(){
-		aliens += 1;
 		keySet.clear();
 		wallArray.clear();
 		bulletArray.clear();
 		alienArray.clear();
 		playerArray.clear();
 		targetArray.clear();
+		mineArray.clear();
 		player.respawn(panelWidth / 2, panelHeight / 2);
 
 		for(int i = 1; i < aliens; i++){
 			spawnAlien();
-			spawnTarget();
+//			spawnTarget();
 		}
 		for(int i = 1; i < walls; i++){
 			spawnWall();
 		}
 		playerArray.add(player);
-		keySet.clear();
+	}
+	public void nextLevel(){
+		mineArray.clear();
+		bulletArray.clear();
+		alienArray.clear();
+		targetArray.clear();
+		aliens += 1;
+		for(int i = 1; i < aliens; i++){
+			spawnAlien();
+			spawnTarget();
+		}
 	}
 	public void spawnWall(){
-		wallArray.add(new Wall(rand.nextInt(panelWidth),rand.nextInt(panelHeight),rand.nextInt(100),rand.nextInt(100)));
+		wallArray.add(new Wall(rand.nextInt(panelWidth),rand.nextInt(panelHeight),rand.nextInt(100) + 10,rand.nextInt(100) + 10));
 	}
 	public void spawnMine(){
 		mineArray.add(new LandMine(rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 	}
 	public void spawnAlien(){
-		alienArray.add(new Alien(rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
+		Alien cAlien;
+		do{
+			cAlien = new Alien(rand.nextInt(panelWidth),rand.nextInt(panelHeight));
+		}while(GameMath.getDistance(cAlien, player) < safeSpawnDistance);
+		alienArray.add(cAlien);
 	}
 	public void spawnTarget(){
 		targetArray.add(new Target(rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
@@ -113,11 +128,11 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		updateBullets();
 		checkCollisions();
 		checkObstacleCollisions();
+		if(checkGameWin()){
+			nextLevel();
+		}
 		if(checkGameLose()){
 			startGame();
-		}
-		if(checkGameWin()){
-//			startGame();
 		}
 		this.repaint();
 	}
@@ -342,7 +357,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			}
 			for(Wall w : wallArray){
 				if(GameMath.doCollide(e, w)){
-					e.onWallCollide();
+					particleArray.addAll(e.onWallCollide());
 					l2 = w.getLeftSide();
 					r2 = w.getRightSide();
 					u2 = w.getUpSide();
@@ -369,7 +384,6 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 					if(minIndex == 3){
 						e.y = d2 + (e.height - 1) / 2 + 2;
 					}
-					
 //					if(Math.abs(e.x - w.x) > Math.abs(e.y - w.y)){
 //						if(e.x < w.x){
 //							e.x = l2 - (e.width - 1) / 2 - 2;

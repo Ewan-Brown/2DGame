@@ -67,8 +67,8 @@ public class Entity {
 			this.y -= y * speed;
 		}
 	}
-	public void onWallCollide(){
-		
+	public  ArrayList<? extends Particle> onWallCollide(){
+		return new ArrayList<Particle>();
 	}
 
 	public double getLeftSide(){

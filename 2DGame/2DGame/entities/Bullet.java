@@ -3,6 +3,9 @@ package entities;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import effects.Effects;
+import effects.Particle;
+
 public class Bullet extends EntityAI{
 
 	double deltaX;
@@ -24,15 +27,12 @@ public class Bullet extends EntityAI{
 		this.x += deltaX;
 		this.y += deltaY;
 	}
-	public ArrayList<Bullet> clusterBomb(){
-		ArrayList<Bullet> bArray = new ArrayList<Bullet>();
-		angle = Math.acos(deltaX / 2);
-		deltaX = 2.0 * Math.cos(angle);
-		deltaY = 2.0 * Math.sin(angle);
-		return bArray;
-	}
-	public void onWallCollide(){
+	public  ArrayList<? extends Particle> onWallCollide(){
 		this.dead = true;
+		return Effects.explode(x, y, color, 3);
+	}
+	public ArrayList<? extends Particle> onDeath(){
+		return new ArrayList<Particle>();
 	}
 
 }
