@@ -10,15 +10,15 @@ public class Effects {
 	public static enum particleType{
 		EXPLODE,SWIRLY,FIREWORKS,IMPLODE,FLIP;
 	}
-	public static ArrayList<Particle> explode(double x, double y, Color c){
+	public static ArrayList<ParticleExplode> explode(double x, double y, Color c){
 		return explode(x,y,c,100);
 	}
-	public static ArrayList<Particle> explode(double x, double y, Color c, int pNum){
+	public static ArrayList<ParticleExplode> explode(double x, double y, Color c, int pNum){
 		Random rand = new Random();
 		int speed = 20;
-		ArrayList<Particle> pArray = new ArrayList<Particle>();
+		ArrayList<ParticleExplode> pArray = new ArrayList<ParticleExplode>();
 		for(int i = 0; i < pNum; i ++){
-			pArray.add(new Particle(x,y,(rand.nextDouble() * speed) - (speed / 2),(rand.nextDouble() * speed) - speed / 2,c));
+			pArray.add(new ParticleExplode(x,y,(rand.nextDouble() * speed) - (speed / 2),(rand.nextDouble() * speed) - speed / 2,c));
 		}
 		return pArray;
 	}
@@ -33,7 +33,7 @@ public class Effects {
 		return pArray;
 	}
 	//XXX Firework doesn't work with Particle Swirly because it returns a swirly and not a base 'particle'
-	public static ArrayList<Particle> fireworks(ArrayList<Particle> array){
+	public static ArrayList<ParticleExplode> fireworks(ArrayList<ParticleExplode> array){
 		Random rand = new Random();
 		for(int i = 0; i < array.size(); i++){
 			array.get(i).color = new Color(rand.nextInt(255),rand.nextInt(255),rand.nextInt(255));

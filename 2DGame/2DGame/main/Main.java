@@ -11,7 +11,6 @@ import javax.swing.KeyStroke;
 import settings.ControlSet;
 
 public class Main{
-	//Todo Finished sword code, just need to render it now? - should sword be diagonal too?
 	static Game panel;
 	static JFrame frame;
 	public static int w = 1000;
