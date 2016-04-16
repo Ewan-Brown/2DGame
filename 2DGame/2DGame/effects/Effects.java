@@ -80,6 +80,17 @@ public class Effects {
 		return pArray;
 		
 	}
+	//TODO get angle from speeds and shoot in that direction!
+	public static ArrayList<ParticleExplode> shockwave(double x, double y,double speedX,double speedY, Color c){
+		int pNum = 50;
+		Random rand = new Random();
+		int speed = 10;
+		ArrayList<ParticleExplode> pArray = new ArrayList<ParticleExplode>();
+		for(int i = 0; i < pNum; i ++){
+			pArray.add(new ParticleExplode(x,y,speedX * rand.nextInt(speed) + rand.nextInt(2),speedY * rand.nextInt(speed) + rand.nextInt(2),c));
+		}
+		return pArray;
+	}
 	/*TODO
 	 * Implode - WIP
 	 * Warp-Speed line things?

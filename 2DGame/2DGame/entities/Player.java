@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.BitSet;
 
 import effects.Effects;
+import effects.Particle;
+import effects.ParticleExplode;
 import effects.ParticleImplode;
 import main.GameMath;
 import settings.ControlSet;
@@ -33,6 +35,9 @@ public class Player extends Entity{
 	public ArrayList<ParticleImplode> onDeath(){
 		Color c = color;
 		this.deadColor();
+		double speedX = controls.getX();
+		//TODO Why does this have to be negative?
+		double speedY = -controls.getY();
 		return Effects.implode(this.x, this.y, c);
 
 	}

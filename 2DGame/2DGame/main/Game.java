@@ -19,6 +19,7 @@ import java.util.Random;
 
 import javax.swing.JPanel;
 
+import effects.Particle;
 import effects.ParticleExplode;
 import entities.Alien;
 import entities.Bullet;
@@ -38,9 +39,9 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public final DecimalFormat df = new DecimalFormat("#.##");
 	int slideSpeed = 2;
 	Player player;
-	public double safeSpawnDistance = 700;
-	int aliens = 1;
-	int walls = 10;
+	public double safeSpawnDistance = 200;
+	int aliens = 10;
+	int walls = 15;
 	int panelWidth;
 	int panelHeight;
 	public enum Direction{Left,Right,Up,Down};
@@ -51,7 +52,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	int speedShiftCount = 0;
 	int speedShiftCount2 = 0;
 	//TODO SORT THIS OUT
-	public ArrayList<ParticleExplode> particleArray = new ArrayList<ParticleExplode>();
+	public ArrayList<Particle> particleArray = new ArrayList<Particle>();
 	public ArrayList<Alien> alienArray = new ArrayList<Alien>();
 	public ArrayList<Player> playerArray = new ArrayList<Player>();
 	public ArrayList<Target> targetArray = new ArrayList<Target>();
@@ -74,7 +75,6 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		startGame();
 	}
 	public void startGame(){
-		keySet.clear();
 		wallArray.clear();
 		bulletArray.clear();
 		alienArray.clear();
@@ -100,7 +100,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		aliens += 1;
 		for(int i = 1; i < aliens; i++){
 			spawnAlien();
-//			spawnTarget();
+			//			spawnTarget();
 		}
 	}
 	public void spawnWall(){
@@ -195,7 +195,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		return a;
 	}
 	public void drawEffects(Graphics g){
-		ParticleExplode cParticle;
+		Particle cParticle;
 		for(int i = 0; i < particleArray.size(); i++){
 			cParticle = particleArray.get(i);
 			g.setColor(cParticle.color);
@@ -205,39 +205,38 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void drawMines(Graphics g){
 		g.setColor(Color.RED);
 		for(LandMine cMine : mineArray){
-			g.fillRect((int)cMine.x - ((cMine.width - 1) / 2), (int)cMine.y - ((cMine.height - 1) / 2), cMine.width ,cMine.height);
+			drawEntity(g,cMine);
 		}
 	}
 	public void drawBullets(Graphics g){
 		for(Bullet cBullet : bulletArray){
-			g.setColor(cBullet.color);
-			g.fillRect((int)cBullet.x - ((cBullet.width - 1) / 2), (int)cBullet.y - ((cBullet.height - 1) / 2), cBullet.width ,cBullet.height);
+			drawEntity(g,cBullet);
 		}
 	}
 	public void drawTargets(Graphics g){
 		for(Target cTarget : targetArray){
-			g.setColor(cTarget.color);
-			g.fillRect((int)cTarget.x - ((cTarget.width - 1) / 2), (int)cTarget.y - ((cTarget.height - 1) / 2), cTarget.width ,cTarget.height);
+			drawEntity(g,cTarget);
 		}
 	}
 	public void drawPlayers(Graphics g){
 		for(Player cPlayer : playerArray){
-			g.setColor(cPlayer.color);
-			g.fillRect((int)cPlayer.x - ((cPlayer.width - 1) / 2), (int)cPlayer.y - ((cPlayer.height - 1) / 2), cPlayer.width ,cPlayer.height);
-
+			drawEntity(g,cPlayer);
 		}
 	}
 	public void drawAliens(Graphics g){
 		for(Alien cAlien : alienArray){
-			g.setColor(cAlien.color);
-			g.fillRect((int)cAlien.x - ((cAlien.width - 1) / 2), (int)cAlien.y - ((cAlien.height - 1) / 2), cAlien.width ,cAlien.height);
+			drawEntity(g,cAlien);
+
 		}
 	}
 	public void drawWalls(Graphics g){
 		for(Wall cWall : wallArray){
-			g.setColor(cWall.color);
-			g.fillRect((int)cWall.x - ((cWall.width - 1) / 2), (int)cWall.y - ((cWall.height - 1) / 2), cWall.width, cWall.height);
+			drawEntity(g,cWall);
 		}
+	}
+	public void drawEntity(Graphics g,Entity e){
+		g.setColor(e.color);
+		g.fillRect((int)e.x - ((e.width - 1) / 2), (int)e.y - ((e.height - 1) / 2), e.width, e.height);
 	}
 	public void updateMines(){
 		for(int i = 0; i < mineArray.size(); i++){
@@ -364,54 +363,56 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		int minIndex;
 		ArrayList<Double> overLap = new ArrayList<Double>(4);
 		for(Entity e : allEntities){
-			l = e.getLeftSide();
-			r = e.getRightSide();
-			u = e.getUpSide();
-			d = e.getDownSide();
-			if(l < 0){
-				e.onWallCollide();
-				e.x = (e.width - 1) / 2;
-			}
-			if(r > panelWidth){
-				e.onWallCollide();
-				e.x = panelWidth - (e.width - 1) / 2;
-			}
-			if(u < 0){
-				e.onWallCollide();
-				e.y = (e.height - 1) / 2;
-			}
-			if(d > panelHeight){
-				e.onWallCollide();
-				e.y = panelWidth - (e.height - 1) / 2;
-			}
-			for(Wall w : wallArray){
-				if(GameMath.doCollide(e, w)){
-					particleArray.addAll(e.onWallCollide());
-					l2 = w.getLeftSide();
-					r2 = w.getRightSide();
-					u2 = w.getUpSide();
-					d2 = w.getDownSide();
-					overLap.add(0, Math.abs(l2 - r));
-					overLap.add(1, Math.abs(r2 - l));
-					overLap.add(2, Math.abs(u2 - d));
-					overLap.add(3, Math.abs(d2 - u));
-					minIndex = 0;
-					for(int i = 1; i < 4;i++){
-						if(overLap.get(i) < overLap.get(minIndex)){
-							minIndex = i;
+			if(!e.dead){
+				l = e.getLeftSide();
+				r = e.getRightSide();
+				u = e.getUpSide();
+				d = e.getDownSide();
+				if(l < 0){
+					e.onWallCollide();
+					e.x = (e.width - 1) / 2;
+				}
+				if(r > panelWidth){
+					e.onWallCollide();
+					e.x = panelWidth - (e.width - 1) / 2;
+				}
+				if(u < 0){
+					e.onWallCollide();
+					e.y = (e.height - 1) / 2;
+				}
+				if(d > panelHeight){
+					e.onWallCollide();
+					e.y = panelWidth - (e.height - 1) / 2;
+				}
+				for(Wall w : wallArray){
+					if(GameMath.doCollide(e, w)){
+						particleArray.addAll(e.onWallCollide());
+						l2 = w.getLeftSide();
+						r2 = w.getRightSide();
+						u2 = w.getUpSide();
+						d2 = w.getDownSide();
+						overLap.add(0, Math.abs(l2 - r));
+						overLap.add(1, Math.abs(r2 - l));
+						overLap.add(2, Math.abs(u2 - d));
+						overLap.add(3, Math.abs(d2 - u));
+						minIndex = 0;
+						for(int i = 1; i < 4;i++){
+							if(overLap.get(i) < overLap.get(minIndex)){
+								minIndex = i;
+							}
 						}
-					}
-					if(minIndex == 0){
-						e.x = l2 - (e.width - 1) / 2 - 2;
-					}
-					if(minIndex == 1){
-						e.x = r2 + (e.width - 1) / 2 + 2;
-					}
-					if(minIndex == 2){
-						e.y = u2 - (e.height - 1) / 2 - 2;
-					}
-					if(minIndex == 3){
-						e.y = d2 + (e.height - 1) / 2 + 2;
+						if(minIndex == 0){
+							e.x = l2 - (e.width - 1) / 2 - 2;
+						}
+						if(minIndex == 1){
+							e.x = r2 + (e.width - 1) / 2 + 2;
+						}
+						if(minIndex == 2){
+							e.y = u2 - (e.height - 1) / 2 - 2;
+						}
+						if(minIndex == 3){
+							e.y = d2 + (e.height - 1) / 2 + 2;
+						}
 					}
 				}
 			}

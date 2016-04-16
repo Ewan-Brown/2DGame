@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import effects.Effects;
-import effects.ParticleExplode;
+import effects.Particle;
 import main.GameMath;
 
 public class Alien extends EntityAI {
@@ -84,7 +84,7 @@ public class Alien extends EntityAI {
 //		speedY = 2.0 * Math.sin(angle);
 //		return new Bullet((int)x,(int)y,speedX,speedY);
 //	}
-	public ArrayList<? extends ParticleExplode> onDeath(){
+	public ArrayList<? extends Particle> onDeath(){
 		Color c = color;
 		this.deadColor();
 		return Effects.flip(x, y,c);

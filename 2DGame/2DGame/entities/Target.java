@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 
 import effects.Effects;
-import effects.ParticleSwirly;
+import effects.Particle;
 import main.GameMath;
 
 public class Target extends EntityAI{
@@ -26,7 +26,7 @@ public class Target extends EntityAI{
 			}
 		}
 	}
-	public ArrayList<ParticleSwirly> onDeath(){
+	public ArrayList<? extends Particle> onDeath(){
 		Color c = color;
 		this.deadColor();
 		return Effects.swirlyParticle(this.x, this.y, c);

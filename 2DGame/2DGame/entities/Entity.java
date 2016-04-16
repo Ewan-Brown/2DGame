@@ -3,6 +3,7 @@ package entities;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import effects.Particle;
 import effects.ParticleExplode;
 import main.GameMath;
 
@@ -36,8 +37,8 @@ public class Entity {
 	public void onCollision(){
 		this.dead = true;
 	}
-	public ArrayList<? extends ParticleExplode> onDeath(){
-		return new ArrayList<ParticleExplode>();
+	public ArrayList<? extends Particle> onDeath(){
+		return new ArrayList<Particle>();
 	}
 	public void deadColor(){
 		Color c = this.color;
@@ -67,8 +68,8 @@ public class Entity {
 			this.y -= y * speed;
 		}
 	}
-	public  ArrayList<? extends ParticleExplode> onWallCollide(){
-		return new ArrayList<ParticleExplode>();
+	public  ArrayList<? extends Particle> onWallCollide(){
+		return new ArrayList<Particle>();
 	}
 
 	public double getLeftSide(){
