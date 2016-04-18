@@ -11,14 +11,14 @@ public class ControlSet {
 	int upKey,leftKey,downKey,rightKey;
 	int sprintKey;
 	int fasterKey,slowerKey;
-	double speed = 1;
+	public double speed = 1;
 	int cooldown = 20;
 	final int BASE_COOL = 20;
 	int shootUpKey,shootLeftKey,shootDownKey,shootRightKey;
 	int targetKey = KeyEvent.VK_TAB;
 	
 	boolean up,down,left,right;
-	boolean sprint;
+	public boolean sprint;
 	boolean faster,slower;
 	boolean sUp,sLeft,sDown,sRight;
 	
@@ -74,10 +74,7 @@ public class ControlSet {
 		if(right){
 			x += 1;
 		}
-		if(sprint){
-			x *= 2;
-		}
-		return x * speed;
+		return x;
 	}
 	public double getY(){
 		double y = 0;
@@ -87,10 +84,7 @@ public class ControlSet {
 		if(down){
 			y -= 1;
 		}
-		if(sprint){
-			y *= 2;
-		}
-		return y * speed;
+		return y;
 	}
 	public Point getSword(){
 		double y = 0;

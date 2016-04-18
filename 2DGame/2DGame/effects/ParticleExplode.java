@@ -16,7 +16,7 @@ public class ParticleExplode extends Particle{
 			dead = true;
 			return;
 		}
-		if(Math.abs(speedX) < 0.2 && Math.abs(speedY) < 0.2){
+		if(Math.abs(speedX) + Math.abs(speedY) < 0.5){
 			this.dead = true;
 		}
 		

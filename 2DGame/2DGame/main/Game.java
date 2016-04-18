@@ -38,20 +38,15 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	private static final long serialVersionUID = 1L;
 	public final DecimalFormat df = new DecimalFormat("#.##");
 	int slideSpeed = 2;
+	int wallShrinkCount = 10;
+	int WALL_SHRINK_MAX = 3;
 	Player player;
 	public double safeSpawnDistance = 200;
 	int aliens = 10;
 	int walls = 15;
 	int panelWidth;
 	int panelHeight;
-	public enum Direction{Left,Right,Up,Down};
-	Direction direction;
 	BitSet keySet = new BitSet(256);
-	double playerSpeedControl = 1;
-	double player2SpeedControl = 1;
-	int speedShiftCount = 0;
-	int speedShiftCount2 = 0;
-	//TODO SORT THIS OUT
 	public ArrayList<Particle> particleArray = new ArrayList<Particle>();
 	public ArrayList<Alien> alienArray = new ArrayList<Alien>();
 	public ArrayList<Player> playerArray = new ArrayList<Player>();
@@ -83,9 +78,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		mineArray.clear();
 		player.respawn(panelWidth / 2, panelHeight / 2);
 
-		for(int i = 1; i < aliens; i++){
+		for(int i = 0; i < aliens; i++){
 			spawnAlien();
-			//spawnTarget();
 		}
 		for(int i = 0; i < walls; i++){
 			spawnWall();
@@ -97,15 +91,13 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		bulletArray.clear();
 		alienArray.clear();
 		targetArray.clear();
-		aliens += 1;
-		for(int i = 1; i < aliens; i++){
+		for(int i = 0; i < aliens; i++){
 			spawnAlien();
 			//			spawnTarget();
 		}
 	}
 	public void spawnWall(){
-		//TODO stop walls from spawning within eachother
-		wallArray.add(new Wall(panelWidth - rand.nextInt(300),rand.nextInt(panelHeight),rand.nextInt(100) + 10,rand.nextInt(100) + 10));
+		wallArray.add(new Wall(rand.nextInt(panelWidth),rand.nextInt(panelHeight),rand.nextInt(100) + 10,rand.nextInt(100) + 10));
 
 	}
 	public void spawnMine(){
@@ -113,7 +105,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	}
 	public void spawnAlien(){
 		Alien cAlien;
-		//XXX this is too CPU-intensive
+		//XXX stupid loop
 		do{
 			cAlien = new Alien(rand.nextInt(panelWidth),rand.nextInt(panelHeight));
 		}while(GameMath.getDistance(cAlien, player) < safeSpawnDistance);
@@ -123,15 +115,53 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		targetArray.add(new Target(rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 	}
 	public void slide(){
-		ArrayList<Entity> tempArray = new ArrayList<Entity>();
+		ArrayList<Wall> tempArray = new ArrayList<Wall>();
 		tempArray.addAll(wallArray);
-		for(Entity e : tempArray){
-			e.x -= slideSpeed;
+		Wall w;
+		for(int i = 0; i < wallArray.size(); i++){
+			w = wallArray.get(i);
+			w.x -= slideSpeed;
+			if(w.getRightSide() < 0){
+				wallArray.remove(i);
+				spawnWall();
+			}
+		}
+		ArrayList<Entity> tempArray2 = new ArrayList<Entity>();
+		tempArray2.addAll(playerArray);
+		tempArray2.addAll(alienArray);
+		tempArray2.addAll(targetArray);
+		tempArray2.addAll(mineArray);
+		for(Entity e : tempArray2){
+			if(e.getRightSide() < 0){
+				e.onCollision();
+			}
+		}		
+		System.out.println(wallArray.size());
+	}
+	public void shrinkWalls(){
+		ArrayList<Wall> tempArray = new ArrayList<Wall>();
+		tempArray.addAll(wallArray);
+		Wall w;
+		wallShrinkCount--;
+		//XXX Stupid counter crap
+		for(int i = 0; i < wallArray.size();i++){
+			w = wallArray.get(i);
+			if(wallShrinkCount < 1){
+				w.width -= 1;
+				w.height -= 1;
+			}
+			if(w.width < 1 || w.height < 1){
+				wallArray.remove(i);
+				spawnWall();
+			}
+		}
+		if(wallShrinkCount < 1){
+			wallShrinkCount = WALL_SHRINK_MAX;
 		}
 	}
 	public void update(){
-		System.out.println(wallArray.size());
 		slide();
+//		shrinkWalls();
 		updateEffects();
 		player.updateControls(keySet);
 		addBullets(player.shoot());
@@ -139,7 +169,6 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		updateAliens();
 		updateTargets();
 		updateBullets();
-		checkObstacleOutOfBounds();
 		checkCollisions();
 		checkObstacleCollisions();
 		if(checkGameWin()){
@@ -236,7 +265,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	}
 	public void drawEntity(Graphics g,Entity e){
 		g.setColor(e.color);
-		g.fillRect((int)e.x - ((e.width - 1) / 2), (int)e.y - ((e.height - 1) / 2), e.width, e.height);
+		g.fillRect((int)e.x - ((e.width - 1) / 2), (int)e.y - ((e.height - 1) / 2), 	e.width, e.height);
 	}
 	public void updateMines(){
 		for(int i = 0; i < mineArray.size(); i++){
@@ -261,7 +290,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			tempArray.addAll(targetArray);
 			cAlien.updateTarget(tempArray);
 			cAlien.moveAI();
-			//			addBullets(cAlien.tryShoot());
+			//addBullets(cAlien.tryShoot());
 		}
 	}
 	public void addBullet(Bullet b){
@@ -287,21 +316,6 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 				bulletArray.remove(i);
 			}
 		}
-	}
-	public void checkObstacleOutOfBounds(){
-		this.wallSpawnCounter--;
-		Wall w;
-		for(int i = 0; i < wallArray.size();i++){
-			w = wallArray.get(i);
-			if(w.getRightSide() < 0){
-				if(wallSpawnCounter < 1){
-					wallSpawnCounter = 30;
-					wallArray.remove(i);
-					spawnWall();
-				}
-			}
-		}
-
 	}
 	public void checkCollisions(){
 		ArrayList<Entity> tempArray = new ArrayList<Entity>();

@@ -14,6 +14,9 @@ import main.GameMath;
 import settings.ControlSet;
 
 public class Player extends Entity{
+	public int sprintCharge;
+	public final int TOTAL_SPRINT = 1000;
+	public final int MIN_SPRINT = 100;
 	public boolean sprint;
 	public ControlSet controls;
 	int swordLength = 100;
@@ -21,6 +24,7 @@ public class Player extends Entity{
 	public Entity target;
 	public Player(int x, int y,Color c,ControlSet controls) {
 		super(x,y,c);
+		sprintCharge = TOTAL_SPRINT;
 		this.controls = controls;
 		name = "PLAYER";
 		this.height = 10;
@@ -28,21 +32,30 @@ public class Player extends Entity{
 	}
 	public void moveEntity(double x, double y){
 		if(sprint){
+//			sprintCharge -= 5;
 			speed *= 2;
+		}
+		else{
+//			sprintCharge++;
 		}
 		super.moveEntity(x, y);
 	}
-	public ArrayList<ParticleImplode> onDeath(){
+	public ArrayList<? extends Particle> onDeath(){
 		Color c = color;
 		this.deadColor();
 		double speedX = controls.getX();
 		//TODO Why does this have to be negative?
 		double speedY = -controls.getY();
-		return Effects.implode(this.x, this.y, c);
+		ArrayList<Particle> pArray = new ArrayList<Particle>();
+		pArray.addAll(Effects.shockwave(this.x, this.y,speedX,speedY, c));
+//		pArray.addAll(Effects.implode(x, y, c));
+		return pArray;
 
 	}
 	public void updateControls(BitSet bitset){
 		controls.updateKeys(bitset);
+		this.sprint = controls.sprint;
+		this.speed = controls.speed;
 		moveEntity(controls.getX(),controls.getY());
 	}
 	public Point getSwordPoint(){
@@ -88,6 +101,10 @@ public class Player extends Entity{
 			bArray = null;
 		}
 		return bArray;
+	}
+	public void respawn(int x, int y){
+		super.respawn(x, y);
+		sprintCharge = TOTAL_SPRINT;
 	}
 
 }

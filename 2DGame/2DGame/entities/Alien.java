@@ -69,21 +69,7 @@ public class Alien extends EntityAI {
 		}
 		return bArray;
 	}
-	//TODO smart Shooting DOESNT WORK
-//	public Bullet shootSmart(){
-//		double speedX,speedY;
-//		double tX,tY;
-//		tY = target.y;
-//		tX = target.x;
-//		if(target instanceof Target){
-//			tY += ((Target)target).deltaY * 30;
-//			tX += ((Target) target).deltaY * 30;
-//		}
-//		angle = Math.atan2(tY - y, tX - x) + ((rand.nextDouble() - 0.5) * SHOT_MULT);
-//		speedX = 2.0 * Math.cos(angle);
-//		speedY = 2.0 * Math.sin(angle);
-//		return new Bullet((int)x,(int)y,speedX,speedY);
-//	}
+	//TODO smart shooting?
 	public ArrayList<? extends Particle> onDeath(){
 		Color c = color;
 		this.deadColor();
