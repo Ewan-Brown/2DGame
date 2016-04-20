@@ -14,7 +14,7 @@ public class Alien extends EntityAI {
 	int cooldownTimer = 250;
 	Random rand;
 	final double SHOTGUN_CHOKE = 0.08;
-	final double SHOT_MULT = 0.1;
+	double shotAccuracy = 0.1;
 
 	public Alien(int x, int y) {
 		super(x, y,Color.RED);
@@ -50,7 +50,7 @@ public class Alien extends EntityAI {
 	}
 	public Bullet shoot(){
 		double speedX,speedY;
-		angle = Math.atan2(target.y - y, target.x - x) + ((rand.nextDouble() - 0.5) * SHOT_MULT);
+		angle = Math.atan2(target.y - y, target.x - x) + ((rand.nextDouble() - 0.5) * shotAccuracy);
 		speedX = 2.0 * Math.cos(angle);
 		speedY = 2.0 * Math.sin(angle);
 		return new Bullet((int)x,(int)y,speedX,speedY);
@@ -59,7 +59,7 @@ public class Alien extends EntityAI {
 	public ArrayList<Bullet> shotgun(){
 		ArrayList<Bullet> bArray = new ArrayList<Bullet>();
 		double speedX,speedY;
-		angle = Math.atan2(target.y - y, target.x - x) + ((rand.nextDouble() - 0.5) * SHOT_MULT);
+		angle = Math.atan2(target.y - y, target.x - x) + ((rand.nextDouble() - 0.5) * shotAccuracy);
 		angle -= SHOTGUN_CHOKE;
 		for(int i = 0; i < 3;i++){
 			speedX = 2.0 * Math.cos(angle);
@@ -69,6 +69,7 @@ public class Alien extends EntityAI {
 		}
 		return bArray;
 	}
+	//TODO laser shoot!
 	//TODO smart shooting?
 	public ArrayList<? extends Particle> onDeath(){
 		Color c = color;
@@ -80,7 +81,7 @@ public class Alien extends EntityAI {
 		this.x += deltaX;
 		this.y += deltaY;
 	}
-	public void onCollision(){
+	public void onEntityCollision(){
 		this.dead = true;
 	}
 

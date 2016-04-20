@@ -2,12 +2,12 @@ package effects;
 
 import java.awt.Color;
 
-public class ParticleExplode extends Particle{
+public class ParticleBasic extends Particle{
 	
-	public ParticleExplode(double x, double y, double speedX, double speedY){
+	public ParticleBasic(double x, double y, double speedX, double speedY){
 		this(x,y,speedX,speedY,Color.RED);
 	}
-	public ParticleExplode(double x, double y, double speedX, double speedY,Color c){
+	public ParticleBasic(double x, double y, double speedX, double speedY,Color c){
 		super(x,y,speedX,speedY,c);
 	}
 	public void update(){

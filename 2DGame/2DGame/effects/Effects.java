@@ -10,15 +10,15 @@ public class Effects {
 	public static enum particleType{
 		EXPLODE,SWIRLY,FIREWORKS,IMPLODE,FLIP;
 	}
-	public static ArrayList<ParticleExplode> explode(double x, double y, Color c){
+	public static ArrayList<ParticleBasic> explode(double x, double y, Color c){
 		return explode(x,y,c,100);
 	}
-	public static ArrayList<ParticleExplode> explode(double x, double y, Color c, int pNum){
+	public static ArrayList<ParticleBasic> explode(double x, double y, Color c, int pNum){
 		Random rand = new Random();
 		int speed = 20;
-		ArrayList<ParticleExplode> pArray = new ArrayList<ParticleExplode>();
+		ArrayList<ParticleBasic> pArray = new ArrayList<ParticleBasic>();
 		for(int i = 0; i < pNum; i ++){
-			pArray.add(new ParticleExplode(x,y,(rand.nextDouble() * speed) - (speed / 2),(rand.nextDouble() * speed) - speed / 2,c));
+			pArray.add(new ParticleBasic(x,y,(rand.nextDouble() * speed) - (speed / 2),(rand.nextDouble() * speed) - speed / 2,c));
 		}
 		return pArray;
 	}
@@ -75,16 +75,16 @@ public class Effects {
 		
 	}
 	//TODO get angle from speeds and shoot in that direction!
-	public static ArrayList<ParticleExplode> shockwave(double x, double y,double speedX,double speedY,Color c){
+	public static ArrayList<ParticleBasic> shockwave(double x, double y,double speedX,double speedY,Color c){
 		int pNum = 50;
 		Random rand = new Random();
 		double angle = Math.atan2(speedX,speedY);
 		double offset = 1.5;
 		double speedY2 = Math.cos(angle);
 		double speedX2 = Math.sin(angle);
-		ArrayList<ParticleExplode> pArray = new ArrayList<ParticleExplode>();
+		ArrayList<ParticleBasic> pArray = new ArrayList<ParticleBasic>();
 		for(int i = 0; i < pNum; i ++){
-			pArray.add(new ParticleExplode(x,y,speedX2 + ((rand.nextDouble() - 0.5) * offset),speedY2 + ((rand.nextDouble() - 0.5) * offset),c));
+			pArray.add(new ParticleBasic(x,y,speedX2 * 2 + ((rand.nextDouble() - 0.5) * offset),speedY2 * 2 + ((rand.nextDouble() - 0.5) * offset),c));
 			//pArray.add(new ParticleExplode(x,y,speedX * rand.nextInt(speed) + rand.nextInt(2),speedY * rand.nextInt(speed) + rand.nextInt(2),c));
 		}
 		return pArray;

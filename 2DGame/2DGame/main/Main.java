@@ -26,7 +26,7 @@ public class Main{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		start();
+		start();		
 	}
 	public static void updateControls() throws IOException{
 		List<String> text = TextFileReader.readFile("Controls.text");

@@ -5,11 +5,10 @@ import java.awt.Point;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Random;
 
 import effects.Effects;
 import effects.Particle;
-import effects.ParticleExplode;
-import effects.ParticleImplode;
 import main.GameMath;
 import settings.ControlSet;
 
@@ -17,13 +16,19 @@ public class Player extends Entity{
 	public int sprintCharge;
 	public final int TOTAL_SPRINT = 1000;
 	public final int MIN_SPRINT = 100;
+	double shotAccuracy = 0.1;
 	public boolean sprint;
 	public ControlSet controls;
 	int swordLength = 100;
 	public Point lastClick;
 	public Entity target;
+	int MAX_AMMUNITION = 20;
+	int ammunition = 20;
+	Random rand;
 	public Player(int x, int y,Color c,ControlSet controls) {
 		super(x,y,c);
+		maxHealth = 1000;
+		rand = new Random();
 		sprintCharge = TOTAL_SPRINT;
 		this.controls = controls;
 		name = "PLAYER";
@@ -86,12 +91,14 @@ public class Player extends Entity{
 	}
 	public ArrayList<Bullet> shoot(){
 		ArrayList<Bullet> bArray = new ArrayList<Bullet>();
-		if(!dead){
+		if(!dead && ammunition > 0){
 			if(lastClick == null){
 				return null;
 			}
+			ammunition--;
 			double speedX = 0,speedY = 0,angle = 0;
 			angle = Math.atan2(lastClick.y - y, lastClick.x - x);
+			angle += (rand.nextDouble() - 0.5) * 0.3;
 			speedX = 2.0 * Math.cos(angle);
 			speedY = 2.0 * Math.sin(angle);
 			lastClick = null;
@@ -105,6 +112,7 @@ public class Player extends Entity{
 	public void respawn(int x, int y){
 		super.respawn(x, y);
 		sprintCharge = TOTAL_SPRINT;
+		this.ammunition = 20;
 	}
 
 }

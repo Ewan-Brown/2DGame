@@ -20,7 +20,7 @@ import java.util.Random;
 import javax.swing.JPanel;
 
 import effects.Particle;
-import effects.ParticleExplode;
+import effects.ParticleBasic;
 import entities.Alien;
 import entities.Bullet;
 import entities.Entity;
@@ -54,7 +54,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public ArrayList<Bullet> bulletArray = new ArrayList<Bullet>();
 	public ArrayList<LandMine> mineArray = new ArrayList<LandMine>();
 	public ArrayList<Wall> wallArray = new ArrayList<Wall>();
-	ParticleExplode cParticle;
+	ParticleBasic cParticle;
 	Random rand;
 	int wallSpawnCounter = 0;
 	public Game(int w, int h,ControlSet controls[]){
@@ -133,10 +133,9 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		tempArray2.addAll(mineArray);
 		for(Entity e : tempArray2){
 			if(e.getRightSide() < 0){
-				e.onCollision();
+				e.onEntityCollision();
 			}
 		}		
-		System.out.println(wallArray.size());
 	}
 	public void shrinkWalls(){
 		ArrayList<Wall> tempArray = new ArrayList<Wall>();
@@ -161,7 +160,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	}
 	public void update(){
 		slide();
-//		shrinkWalls();
+		shrinkWalls();
 		updateEffects();
 		player.updateControls(keySet);
 		addBullets(player.shoot());
@@ -192,13 +191,9 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D) g;
-		drawTargets(g2);
-		drawPlayers(g2);
-		drawAliens(g2);
-		drawMines(g2);
-		drawBullets(g2);
 		drawEffects(g2);
-		drawWalls(g2);
+		drawEntities(g2);
+		drawHealthBar(g,player);
 		g.setColor(player.color);
 		Line2D sword = player.getSwordLine();
 		g2.draw(sword);
@@ -231,41 +226,29 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			g.fillRect((int)cParticle.x, (int)cParticle.y, 2, 2);
 		}
 	}
-	public void drawMines(Graphics g){
-		g.setColor(Color.RED);
-		for(LandMine cMine : mineArray){
-			drawEntity(g,cMine);
-		}
-	}
-	public void drawBullets(Graphics g){
-		for(Bullet cBullet : bulletArray){
-			drawEntity(g,cBullet);
-		}
-	}
-	public void drawTargets(Graphics g){
-		for(Target cTarget : targetArray){
-			drawEntity(g,cTarget);
-		}
-	}
-	public void drawPlayers(Graphics g){
-		for(Player cPlayer : playerArray){
-			drawEntity(g,cPlayer);
-		}
-	}
-	public void drawAliens(Graphics g){
-		for(Alien cAlien : alienArray){
-			drawEntity(g,cAlien);
-
-		}
-	}
-	public void drawWalls(Graphics g){
-		for(Wall cWall : wallArray){
-			drawEntity(g,cWall);
+	public void drawEntities(Graphics g){
+		ArrayList<Entity> tempArray = new ArrayList<Entity>();
+		tempArray.addAll(alienArray);
+		tempArray.addAll(mineArray);
+		tempArray.addAll(bulletArray);
+		tempArray.addAll(playerArray);
+		tempArray.addAll(targetArray);
+		tempArray.addAll(wallArray);
+		for(Entity e : tempArray){
+			g.setColor(e.color);
+			drawEntity(g,e);
 		}
 	}
 	public void drawEntity(Graphics g,Entity e){
 		g.setColor(e.color);
 		g.fillRect((int)e.x - ((e.width - 1) / 2), (int)e.y - ((e.height - 1) / 2), 	e.width, e.height);
+	}
+	public void drawHealthBar(Graphics g, Entity e){
+		double health = e.health;
+		int barWidth = 30;
+		double x = e.x - (barWidth * (health / e.maxHealth)) / 2;
+		double y = e.getBottomSide() + 5;
+		g.fillRect((int)x, (int)y,(int) (barWidth * (health / e.maxHealth)), 3);
 	}
 	public void updateMines(){
 		for(int i = 0; i < mineArray.size(); i++){
@@ -290,19 +273,19 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			tempArray.addAll(targetArray);
 			cAlien.updateTarget(tempArray);
 			cAlien.moveAI();
-			//addBullets(cAlien.tryShoot());
+			addBullets(cAlien.tryShoot());
 		}
 	}
-	public void addBullet(Bullet b){
-		if(b != null){
-			bulletArray.add(b);
+	public void addBullet(Bullet cBullet){
+		if(cBullet != null){
+			bulletArray.add(cBullet);
 		}
 	}
-	public void addBullets(ArrayList<Bullet> b){
-		if(b != null){
-			for(Bullet i : b){
-				if(i != null){
-					bulletArray.add(i);
+	public void addBullets(ArrayList<Bullet> bArray){
+		if(bArray != null){
+			for(Bullet cBullet : bArray){
+				if(cBullet != null){
+					bulletArray.add(cBullet);
 				}
 			}
 		}
@@ -326,7 +309,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 				for(Entity cEntity : tempArray){
 					if(!cEntity.dead){
 						if(GameMath.getDistance(cAlien, cEntity) < ((cAlien.width + 1) / 2) + ((cEntity.width + 1) / 2)){
-							cEntity.onCollision();
+							cEntity.onEntityCollision();
 							particleArray.addAll(cEntity.onDeath());
 						}
 					}
@@ -340,8 +323,9 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 				for(Entity cEntity : tempArray){
 					if(!cEntity.dead){
 						if(GameMath.getDistance(cBullet, cEntity) < ((cBullet.width + 1) / 2) + ((cEntity.width + 1) / 2)){
-							cEntity.onCollision();
-							particleArray.addAll(cEntity.onDeath());
+							if(cEntity.onBulletHit()){
+								particleArray.addAll(cEntity.onDeath());
+							}
 						}
 					}
 
@@ -358,7 +342,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 				if(cEntity.dead == false){
 					tempRectangle = new Rectangle((int)cEntity.x - ((cEntity.width - 1) / 2), (int)cEntity.y - ((cEntity.height - 1) / 2),cEntity.width,cEntity.height);
 					if(swordLine.intersects(tempRectangle)){
-						cEntity.onCollision();
+						cEntity.onMeleeHit();
 						particleArray.addAll(cEntity.onDeath());
 					}
 				}
@@ -381,7 +365,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 				l = e.getLeftSide();
 				r = e.getRightSide();
 				u = e.getUpSide();
-				d = e.getDownSide();
+				d = e.getBottomSide();
 				if(l < 0){
 					e.onWallCollide();
 					e.x = (e.width - 1) / 2;
@@ -404,7 +388,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 						l2 = w.getLeftSide();
 						r2 = w.getRightSide();
 						u2 = w.getUpSide();
-						d2 = w.getDownSide();
+						d2 = w.getBottomSide();
 						overLap.add(0, Math.abs(l2 - r));
 						overLap.add(1, Math.abs(r2 - l));
 						overLap.add(2, Math.abs(u2 - d));

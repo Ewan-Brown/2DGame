@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import effects.Effects;
 import effects.Particle;
-import effects.ParticleExplode;
+import effects.ParticleBasic;
 
 public class Bullet extends EntityAI{
 
@@ -28,12 +28,12 @@ public class Bullet extends EntityAI{
 		this.x += deltaX;
 		this.y += deltaY;
 	}
-	public  ArrayList<? extends ParticleExplode> onWallCollide(){
+	public  ArrayList<? extends ParticleBasic> onWallCollide(){
 		this.dead = true;
 		return Effects.explode(x, y, color, 3);
 	}
 	public ArrayList<? extends Particle> onDeath(){
-		return new ArrayList<ParticleExplode>();
+		return new ArrayList<ParticleBasic>();
 	}
 
 }

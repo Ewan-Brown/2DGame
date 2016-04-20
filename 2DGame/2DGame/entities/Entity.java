@@ -1,17 +1,19 @@
 package entities;
 
 import java.awt.Color;
+import java.awt.Point;
 import java.util.ArrayList;
 
 import effects.Particle;
-import effects.ParticleExplode;
+import effects.ParticleBasic;
 import main.GameMath;
 
 public class Entity {
 
 	public String name;
 	public double x, y;
-	int health;
+	public int health;
+	public int maxHealth = 100;
 	public int width = 10;
 	public int height = 10;
 	public double speed = 1;
@@ -30,12 +32,30 @@ public class Entity {
 		this.x = x;
 		this.y = y;
 		this.dead = false;
-		this.health = 100;
+		this.health = maxHealth;
 		this.speed = 1;
 		this.color = baseColor;
 	}
-	public void onCollision(){
+	public void onEntityCollision(){
 		this.dead = true;
+	}
+	public boolean onBulletHit(){
+		//TODO variable/constant for bullet damage
+		this.health -= 10;
+		if(health < 1){
+			this.dead = true;
+			return true;
+		}
+		return false;
+	}
+	public boolean onMeleeHit(){
+		//TODO variable/constant for melee damage
+				this.health -= 50;
+				if(health < 1){
+					this.dead = true;
+					return true;
+				}
+				return false;
 	}
 	public ArrayList<? extends Particle> onDeath(){
 		return new ArrayList<Particle>();
@@ -82,7 +102,7 @@ public class Entity {
 	public double getUpSide(){
 		return (this.y - (this.height - 1) / 2);
 	}
-	public double getDownSide(){
+	public double getBottomSide(){
 		return(this.y +(this.height - 1) / 2);
 	}
 }
