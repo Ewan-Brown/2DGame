@@ -6,12 +6,13 @@ import entities.Entity;
 
 public class BasicPowerup extends Entity{
 
-	public BasicPowerup(int x, int y, Color c) {
-		super(x, y, c);
+	public BasicPowerup(int x, int y) {
+		super(x, y, Color.PINK);
 	}
 	public void onEntityCollision(){}
 	public Entity onPickup(Entity e){
-		e.color = Color.BLUE;
+		e.health = 5;
+		this.dead = true;
 		return e;
 	}
 	public boolean onBulletHit(){

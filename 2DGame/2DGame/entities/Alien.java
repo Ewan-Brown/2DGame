@@ -18,6 +18,8 @@ public class Alien extends EntityAI {
 
 	public Alien(int x, int y) {
 		super(x, y,Color.RED);
+		this.width = 10;
+		this.height = 10;
 		rand = new Random();
 		this.speed = 1;
 	}

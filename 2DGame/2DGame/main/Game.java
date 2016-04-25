@@ -28,6 +28,7 @@ import entities.LandMine;
 import entities.Player;
 import entities.Target;
 import entities.Wall;
+import entities.powerups.BasicPowerup;
 import settings.ControlSet;
 
 public class Game extends JPanel implements KeyListener,MouseListener{
@@ -54,6 +55,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public ArrayList<Bullet> bulletArray = new ArrayList<Bullet>();
 	public ArrayList<LandMine> mineArray = new ArrayList<LandMine>();
 	public ArrayList<Wall> wallArray = new ArrayList<Wall>();
+	public ArrayList<BasicPowerup> powerupArray = new ArrayList<BasicPowerup>();
 	ParticleBasic cParticle;
 	Random rand;
 	int wallSpawnCounter = 0;
@@ -76,6 +78,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		playerArray.clear();
 		targetArray.clear();
 		mineArray.clear();
+		powerupArray.clear();
+		powerupArray.add(new BasicPowerup(400,500));
 		player.respawn(panelWidth / 2, panelHeight / 2);
 
 		for(int i = 0; i < aliens; i++){
@@ -159,8 +163,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		}
 	}
 	public void update(){
-		slide();
-		shrinkWalls();
+		//		slide();
+		//		shrinkWalls();
 		updateEffects();
 		player.updateControls(keySet);
 		addBullets(player.shoot());
@@ -193,7 +197,6 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		Graphics2D g2 = (Graphics2D) g;
 		drawEffects(g2);
 		drawEntities(g2);
-		drawHealthBar(g,player);
 		g.setColor(player.color);
 		Line2D sword = player.getSwordLine();
 		g2.draw(sword);
@@ -229,11 +232,15 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void drawEntities(Graphics g){
 		ArrayList<Entity> tempArray = new ArrayList<Entity>();
 		tempArray.addAll(alienArray);
-		tempArray.addAll(mineArray);
-		tempArray.addAll(bulletArray);
 		tempArray.addAll(playerArray);
 		tempArray.addAll(targetArray);
+		for(Entity e : tempArray){
+			drawHealthBar(g,e);
+		}
+		tempArray.addAll(mineArray);
+		tempArray.addAll(bulletArray);
 		tempArray.addAll(wallArray);
+		tempArray.addAll(powerupArray);
 		for(Entity e : tempArray){
 			g.setColor(e.color);
 			drawEntity(g,e);
@@ -244,8 +251,9 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		g.fillRect((int)e.x - ((e.width - 1) / 2), (int)e.y - ((e.height - 1) / 2), 	e.width, e.height);
 	}
 	public void drawHealthBar(Graphics g, Entity e){
+		g.setColor(e.color);
 		double health = e.health;
-		int barWidth = 30;
+		int barWidth = 35;
 		double x = e.x - (barWidth * (health / e.maxHealth)) / 2;
 		double y = e.getBottomSide() + 5;
 		g.fillRect((int)x, (int)y,(int) (barWidth * (health / e.maxHealth)), 3);
@@ -301,6 +309,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		}
 	}
 	public void checkCollisions(){
+		//TODO INSTEAD OF onBulletHit/onMeleeHit, send in entity to a 'onhit' method and pass over the attacker's stuff?
 		ArrayList<Entity> tempArray = new ArrayList<Entity>();
 		tempArray.addAll(playerArray);
 		tempArray.addAll(targetArray);
@@ -308,9 +317,10 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			if(!cAlien.dead){
 				for(Entity cEntity : tempArray){
 					if(!cEntity.dead){
-						if(GameMath.getDistance(cAlien, cEntity) < ((cAlien.width + 1) / 2) + ((cEntity.width + 1) / 2)){
-							cEntity.onEntityCollision();
+						if(GameMath.doCollide(cEntity, cAlien)){
+//							cEntity.onEntityCollision();
 							particleArray.addAll(cEntity.onDeath());
+//							particleArray.addAll(cAlien)
 						}
 					}
 
@@ -322,11 +332,22 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			if(!cBullet.dead){
 				for(Entity cEntity : tempArray){
 					if(!cEntity.dead){
-						if(GameMath.getDistance(cBullet, cEntity) < ((cBullet.width + 1) / 2) + ((cEntity.width + 1) / 2)){
+						if(GameMath.doCollide(cEntity, cBullet)){
+							cBullet.dead = true;
 							if(cEntity.onBulletHit()){
 								particleArray.addAll(cEntity.onDeath());
 							}
 						}
+					}
+
+				}
+			}
+		}
+		for(BasicPowerup bP : powerupArray){
+			for(Entity cEntity : tempArray){
+				if(!cEntity.dead){
+					if(GameMath.doCollide(cEntity,bP)){
+						cEntity = bP.onPickup(cEntity);
 					}
 
 				}

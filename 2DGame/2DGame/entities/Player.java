@@ -24,7 +24,6 @@ public class Player extends Entity{
 	public Entity target;
 	int MAX_AMMUNITION = 20;
 	int ammunition = 20;
-	Random rand;
 	public Player(int x, int y,Color c,ControlSet controls) {
 		super(x,y,c);
 		maxHealth = 1000;

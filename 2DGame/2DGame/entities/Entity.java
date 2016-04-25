@@ -1,11 +1,10 @@
 package entities;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Random;
 
 import effects.Particle;
-import effects.ParticleBasic;
 import main.GameMath;
 
 public class Entity {
@@ -20,6 +19,7 @@ public class Entity {
 	public boolean dead;
 	public Color color;
 	public Color baseColor;
+	Random rand;
 	public Entity(int x, int y,Color c){
 		name = "NULL";
 		this.x = x;
@@ -56,6 +56,19 @@ public class Entity {
 					return true;
 				}
 				return false;
+	}
+	public ArrayList<? extends Particle> damage(int damage){
+		ArrayList<Particle> pArray = new ArrayList<Particle>();
+		this.health -= damage;
+		if(health < 1){
+			this.dead = true;
+			pArray.addAll(this.onDeath());
+		}
+		return pArray;
+	}
+	public Entity attack(Entity e){
+		e.damage(10);
+		return e;
 	}
 	public ArrayList<? extends Particle> onDeath(){
 		return new ArrayList<Particle>();

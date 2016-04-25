@@ -85,7 +85,6 @@ public class Effects {
 		ArrayList<ParticleBasic> pArray = new ArrayList<ParticleBasic>();
 		for(int i = 0; i < pNum; i ++){
 			pArray.add(new ParticleBasic(x,y,speedX2 * 2 + ((rand.nextDouble() - 0.5) * offset),speedY2 * 2 + ((rand.nextDouble() - 0.5) * offset),c));
-			//pArray.add(new ParticleExplode(x,y,speedX * rand.nextInt(speed) + rand.nextInt(2),speedY * rand.nextInt(speed) + rand.nextInt(2),c));
 		}
 		return pArray;
 	}
