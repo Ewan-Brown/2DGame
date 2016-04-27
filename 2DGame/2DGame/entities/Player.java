@@ -27,6 +27,7 @@ public class Player extends Entity{
 	public Player(int x, int y,Color c,ControlSet controls) {
 		super(x,y,c);
 		maxHealth = 1000;
+		health = maxHealth;
 		rand = new Random();
 		sprintCharge = TOTAL_SPRINT;
 		this.controls = controls;
@@ -83,6 +84,9 @@ public class Player extends Entity{
 	}
 	public Line2D getSwordLine(){
 		Point p = this.getSwordPoint();
+		if((int)p.x - (int)x == 0 && (int)p.y - (int)y == 0){
+			return null;
+		}
 		return new Line2D.Double(p.x, p.y, x, y);
 	}
 	public void click(Point click){
@@ -107,6 +111,16 @@ public class Player extends Entity{
 			bArray = null;
 		}
 		return bArray;
+	}
+	public Line2D laser(){
+		if(!dead){
+			if(lastClick == null){
+				return null;
+			}
+			Line2D laser = new Line2D.Double(x, y, lastClick.getX(), lastClick.getY());
+			return laser;
+		}
+		return null;
 	}
 	public void respawn(int x, int y){
 		super.respawn(x, y);

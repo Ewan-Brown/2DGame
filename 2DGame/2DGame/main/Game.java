@@ -167,7 +167,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		//		shrinkWalls();
 		updateEffects();
 		player.updateControls(keySet);
-		addBullets(player.shoot());
+//		addBullets(player.shoot());
 		updateMines();
 		updateAliens();
 		updateTargets();
@@ -195,18 +195,20 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D) g;
-		drawEffects(g2);
-		drawEntities(g2);
-		g.setColor(player.color);
-		Line2D sword = player.getSwordLine();
-		g2.draw(sword);
-		g.setColor(Color.white);
-		g.drawString(particleArray.size()+"", panelWidth / 2, panelHeight / 2);
-		g2.setColor(Color.BLACK);
+		Line2D laser = player.laser();
+		if(laser != null){
+			g2.draw(laser);
+		}
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
 				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
 				RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		drawEffects(g2);
+		drawEntities(g2);
+		g.setColor(Color.white);
+		drawSword(g2);
+		g.drawString(particleArray.size()+"", panelWidth / 2, panelHeight / 2);
+		g2.setColor(Color.BLACK);
 	}
 	public int enemiesAlive(){
 		int a = 0;
@@ -244,6 +246,13 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		for(Entity e : tempArray){
 			g.setColor(e.color);
 			drawEntity(g,e);
+		}
+	}
+	public void drawSword(Graphics2D g2){
+		Line2D sword = player.getSwordLine();
+		if(sword != null){
+			g2.setColor(player.color);
+			g2.draw(sword);
 		}
 	}
 	public void drawEntity(Graphics g,Entity e){
@@ -309,7 +318,6 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		}
 	}
 	public void checkCollisions(){
-		//TODO INSTEAD OF onBulletHit/onMeleeHit, send in entity to a 'onhit' method and pass over the attacker's stuff?
 		ArrayList<Entity> tempArray = new ArrayList<Entity>();
 		tempArray.addAll(playerArray);
 		tempArray.addAll(targetArray);
@@ -318,9 +326,10 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 				for(Entity cEntity : tempArray){
 					if(!cEntity.dead){
 						if(GameMath.doCollide(cEntity, cAlien)){
-//							cEntity.onEntityCollision();
-							particleArray.addAll(cEntity.onDeath());
-//							particleArray.addAll(cAlien)
+							cEntity = cAlien.attackEntity(cEntity);
+							if(cEntity.dead){
+								particleArray.addAll(cEntity.onDeath());
+							}
 						}
 					}
 
@@ -333,8 +342,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 				for(Entity cEntity : tempArray){
 					if(!cEntity.dead){
 						if(GameMath.doCollide(cEntity, cBullet)){
-							cBullet.dead = true;
-							if(cEntity.onBulletHit()){
+							cEntity = cBullet.attackEntity(cEntity);
+							if(cEntity.dead){
 								particleArray.addAll(cEntity.onDeath());
 							}
 						}
@@ -358,13 +367,15 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		tempArray.addAll(bulletArray);
 		Rectangle tempRectangle;
 		Line2D swordLine = player.getSwordLine();
-		if(player.dead == false){
+		if(player.dead == false && swordLine != null){
 			for(Entity cEntity : tempArray){
 				if(cEntity.dead == false){
 					tempRectangle = new Rectangle((int)cEntity.x - ((cEntity.width - 1) / 2), (int)cEntity.y - ((cEntity.height - 1) / 2),cEntity.width,cEntity.height);
 					if(swordLine.intersects(tempRectangle)){
-						cEntity.onMeleeHit();
-						particleArray.addAll(cEntity.onDeath());
+						cEntity = player.attackEntity(cEntity);
+						if(cEntity.dead){
+							particleArray.addAll(cEntity.onDeath());
+						}
 					}
 				}
 			}

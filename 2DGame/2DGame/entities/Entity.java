@@ -39,34 +39,24 @@ public class Entity {
 	public void onEntityCollision(){
 		this.dead = true;
 	}
-	public boolean onBulletHit(){
-		//TODO variable/constant for bullet damage
-		this.health -= 10;
-		if(health < 1){
-			this.dead = true;
-			return true;
+	public void heal(){
+		this.heal(maxHealth / 4);
+	}
+	public void heal(int heal){
+		if(health + heal > maxHealth){
+			health = maxHealth;
 		}
-		return false;
+		else{
+			health += heal;
+		}
 	}
-	public boolean onMeleeHit(){
-		//TODO variable/constant for melee damage
-				this.health -= 50;
-				if(health < 1){
-					this.dead = true;
-					return true;
-				}
-				return false;
-	}
-	public ArrayList<? extends Particle> damage(int damage){
-		ArrayList<Particle> pArray = new ArrayList<Particle>();
+	public void damage(int damage){
 		this.health -= damage;
 		if(health < 1){
 			this.dead = true;
-			pArray.addAll(this.onDeath());
 		}
-		return pArray;
 	}
-	public Entity attack(Entity e){
+	public Entity attackEntity(Entity e){
 		e.damage(10);
 		return e;
 	}

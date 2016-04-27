@@ -11,27 +11,9 @@ public class BasicPowerup extends Entity{
 	}
 	public void onEntityCollision(){}
 	public Entity onPickup(Entity e){
-		e.health = 5;
+		e.color = this.color;
 		this.dead = true;
 		return e;
-	}
-	public boolean onBulletHit(){
-		//TODO variable/constant for bullet damage
-		this.health -= 10;
-		if(health < 1){
-			this.dead = true;
-			return true;
-		}
-		return false;
-	}
-	public boolean onMeleeHit(){
-		//TODO variable/constant for melee damage
-				this.health -= 50;
-				if(health < 1){
-					this.dead = true;
-					return true;
-				}
-				return false;
 	}
 
 }
