@@ -163,8 +163,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		}
 	}
 	public void update(){
-		//		slide();
-		//		shrinkWalls();
+//		slide();
+//		shrinkWalls();
 		updateEffects();
 		player.updateControls(keySet);
 //		addBullets(player.shoot());
