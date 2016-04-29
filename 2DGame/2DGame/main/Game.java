@@ -55,7 +55,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public ArrayList<Bullet> bulletArray = new ArrayList<Bullet>();
 	public ArrayList<LandMine> mineArray = new ArrayList<LandMine>();
 	public ArrayList<Wall> wallArray = new ArrayList<Wall>();
-	public ArrayList<BasicPowerup> powerupArray = new ArrayList<BasicPowerup>();
+	public ArrayList<BasicPowerup> powerupArray = new ArrayList<BasicPowerup>();	
 	ParticleBasic cParticle;
 	Random rand;
 	int wallSpawnCounter = 0;
@@ -163,11 +163,12 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		}
 	}
 	public void update(){
-//		slide();
-//		shrinkWalls();
+		//		slide();
+		//		shrinkWalls();
 		updateEffects();
 		player.updateControls(keySet);
-//		addBullets(player.shoot());
+		//		addBullets(player.shoot());
+		laser();
 		updateMines();
 		updateAliens();
 		updateTargets();
@@ -195,14 +196,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D) g;
-		Line2D laser = player.laser();
-		if(laser != null){
-			g2.draw(laser);
-		}
-		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-				RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+		drawLaser(g2);
 		drawEffects(g2);
 		drawEntities(g2);
 		g.setColor(Color.white);
@@ -222,6 +216,12 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			}
 		}
 		return a;
+	}
+	public void drawLaser(Graphics2D g2){
+		Line2D laser = player.laser();
+		if(laser != null){
+			g2.draw(laser);
+		}
 	}
 	public void drawEffects(Graphics g){
 		Particle cParticle;
@@ -372,6 +372,27 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 				if(cEntity.dead == false){
 					tempRectangle = new Rectangle((int)cEntity.x - ((cEntity.width - 1) / 2), (int)cEntity.y - ((cEntity.height - 1) / 2),cEntity.width,cEntity.height);
 					if(swordLine.intersects(tempRectangle)){
+						cEntity = player.attackEntity(cEntity);
+						cEntity.onWallCollide();
+						if(cEntity.dead){
+							particleArray.addAll(cEntity.onDeath());
+						}
+					}
+				}
+			}
+		}
+	}
+	public void laser(){
+		Line2D laser = player.laser();
+		if(laser != null){
+			ArrayList<Entity> tempArray = new ArrayList<Entity>();
+			tempArray.addAll(this.alienArray);
+			tempArray.addAll(this.bulletArray);
+			tempArray.addAll(this.mineArray);
+			tempArray.addAll(this.targetArray);
+			for(Entity cEntity : tempArray){
+				if(!cEntity.dead){
+					if(laser.intersects(new Rectangle((int)cEntity.x,(int)cEntity.y,cEntity.width,cEntity.height))){
 						cEntity = player.attackEntity(cEntity);
 						if(cEntity.dead){
 							particleArray.addAll(cEntity.onDeath());
