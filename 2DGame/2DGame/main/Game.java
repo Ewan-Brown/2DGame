@@ -163,12 +163,12 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		}
 	}
 	public void update(){
-		//		slide();
-		//		shrinkWalls();
+//		slide();
+//		shrinkWalls();
 		updateEffects();
 		player.updateControls(keySet);
-		//		addBullets(player.shoot());
-		laser();
+		addBullets(player.shoot());
+//		laser();
 		updateMines();
 		updateAliens();
 		updateTargets();
@@ -196,11 +196,10 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D) g;
-		drawLaser(g2);
+//		drawLaser(g2);
 		drawEffects(g2);
 		drawEntities(g2);
 		g.setColor(Color.white);
-		drawSword(g2);
 		g.drawString(particleArray.size()+"", panelWidth / 2, panelHeight / 2);
 		g2.setColor(Color.BLACK);
 	}
@@ -220,6 +219,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void drawLaser(Graphics2D g2){
 		Line2D laser = player.laser();
 		if(laser != null){
+			g2.setColor(player.color);
 			g2.draw(laser);
 		}
 	}
@@ -231,24 +231,21 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			g.fillRect((int)cParticle.x, (int)cParticle.y, 2, 2);
 		}
 	}
-	public void drawEntities(Graphics g){
+	public void drawEntities(Graphics2D g2){
 		ArrayList<Entity> tempArray = new ArrayList<Entity>();
 		tempArray.addAll(alienArray);
 		tempArray.addAll(playerArray);
 		tempArray.addAll(targetArray);
 		for(Entity e : tempArray){
-			drawHealthBar(g,e);
+			drawHealthBar(g2,e);
 		}
 		tempArray.addAll(mineArray);
 		tempArray.addAll(bulletArray);
 		tempArray.addAll(wallArray);
 		tempArray.addAll(powerupArray);
 		for(Entity e : tempArray){
-			g.setColor(e.color);
-			drawEntity(g,e);
+			drawEntity(g2,e);
 		}
-	}
-	public void drawSword(Graphics2D g2){
 		Line2D sword = player.getSwordLine();
 		if(sword != null){
 			g2.setColor(player.color);
@@ -392,7 +389,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			tempArray.addAll(this.targetArray);
 			for(Entity cEntity : tempArray){
 				if(!cEntity.dead){
-					if(laser.intersects(new Rectangle((int)cEntity.x,(int)cEntity.y,cEntity.width,cEntity.height))){
+					if(laser.intersects(new Rectangle((int)cEntity.x - ((cEntity.width - 1) / 2), (int)cEntity.y - ((cEntity.height - 1) / 2), 	cEntity.width, cEntity.height))){
 						cEntity = player.attackEntity(cEntity);
 						if(cEntity.dead){
 							particleArray.addAll(cEntity.onDeath());
