@@ -6,12 +6,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -43,7 +44,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	int WALL_SHRINK_MAX = 3;
 	Player player;
 	public double safeSpawnDistance = 200;
-	int aliens = 10;
+	int aliens = 0;
 	int walls = 15;
 	int panelWidth;
 	int panelHeight;
@@ -163,12 +164,12 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		}
 	}
 	public void update(){
-//		slide();
-//		shrinkWalls();
+		//		slide();
+		//		shrinkWalls();
 		updateEffects();
 		player.updateControls(keySet);
-		addBullets(player.shoot());
-//		laser();
+		//		addBullets(player.shoot());
+		laser();
 		updateMines();
 		updateAliens();
 		updateTargets();
@@ -196,7 +197,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D) g;
-//		drawLaser(g2);
+		drawLaser(g2);
 		drawEffects(g2);
 		drawEntities(g2);
 		g.setColor(Color.white);
@@ -219,9 +220,59 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void drawLaser(Graphics2D g2){
 		Line2D laser = player.laser();
 		if(laser != null){
+			laser = cropLaser(laser);
 			g2.setColor(player.color);
 			g2.draw(laser);
 		}
+	}
+	public Line2D cropLaser(Line2D laser){
+		Line2D cLaser = laser;
+		Rectangle2D rect = null;
+		Rectangle2D r;
+		Wall w;
+		double prevDist = 9999999;
+		for(int i = 0; i < wallArray.size();i++){
+			w = wallArray.get(i);
+			r = new Rectangle2D.Double(w.x - ((w.width - 1) / 2), w.y - ((w.height - 1) / 2),w.width,w.height);
+			if(cLaser.intersects(r)){
+				if(GameMath.getDistance(player, w) < prevDist){
+					prevDist = GameMath.getDistance(player, wallArray.get(i));
+					rect = r;
+				}
+			}
+		}
+		if(rect != null){
+			Line2D[] lines = new Line2D[4];
+			Line2D[] intLines = new Line2D[2];
+			Point2D[] intPoints = new Point2D[2];
+			Point2D[] p = new Point2D[4];
+			p[0] = new Point2D.Double(rect.getX(),rect.getY());
+			p[1] = new Point2D.Double(rect.getX() + rect.getWidth(),rect.getY());
+			p[2] = new Point2D.Double(rect.getX() + rect.getWidth(),rect.getY() + rect.getHeight());
+			p[3] = new Point2D.Double(rect.getX(),rect.getY() + rect.getHeight());
+			lines[0] = new Line2D.Double(p[0], p[1]);
+			lines[1] = new Line2D.Double(p[1], p[2]);
+			lines[2] = new Line2D.Double(p[2], p[3]);
+			lines[3] = new Line2D.Double(p[3], p[0]);
+			int f = 0;
+			for(int i = 0; i < 4;i++){
+				if(lines[i].intersectsLine(cLaser)){
+					intLines[f] = lines[i];
+					f++;
+				}
+			}
+			for(int i = 0; i < f ; i++){
+				intPoints[i] = GameMath.getIntersect(cLaser, intLines[i]);
+			}
+			System.out.println(intPoints[0] + " " + intPoints[1]);
+			if(intPoints[1] == null || GameMath.getDistance(player.getPoint(), intPoints[1]) > GameMath.getDistance(player.getPoint(), intPoints[0])){
+				cLaser.setLine(cLaser.getP1(),intPoints[0]);
+			}
+			else if (intPoints[0] != null){
+				cLaser.setLine(cLaser.getP1(),intPoints[1]);
+			}
+		}
+		return cLaser;
 	}
 	public void drawEffects(Graphics g){
 		Particle cParticle;
@@ -381,7 +432,9 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	}
 	public void laser(){
 		Line2D laser = player.laser();
-		if(laser != null){
+		if (laser != null){
+			laser = cropLaser(laser);
+			cropLaser(laser);
 			ArrayList<Entity> tempArray = new ArrayList<Entity>();
 			tempArray.addAll(this.alienArray);
 			tempArray.addAll(this.bulletArray);

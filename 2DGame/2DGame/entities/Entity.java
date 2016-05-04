@@ -1,6 +1,7 @@
 package entities;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -35,6 +36,9 @@ public class Entity {
 		this.health = maxHealth;
 		this.speed = 1;
 		this.color = baseColor;
+	}
+	public Point2D getPoint(){
+		return new Point2D.Double(x,y);
 	}
 	public void onEntityCollision(){
 		this.dead = true;
