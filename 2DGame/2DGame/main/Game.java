@@ -20,6 +20,7 @@ import java.util.Random;
 
 import javax.swing.JPanel;
 
+import effects.Effects;
 import effects.Particle;
 import effects.ParticleBasic;
 import entities.Alien;
@@ -44,7 +45,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	int WALL_SHRINK_MAX = 3;
 	Player player;
 	public double safeSpawnDistance = 200;
-	int aliens = 0;
+	int aliens = 10;
 	int walls = 15;
 	int panelWidth;
 	int panelHeight;
@@ -231,6 +232,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		Rectangle2D r;
 		Wall w;
 		double prevDist = 9999999;
+		//Goes through all walls that laser intersects, and finds the closest one
 		for(int i = 0; i < wallArray.size();i++){
 			w = wallArray.get(i);
 			r = new Rectangle2D.Double(w.x - ((w.width - 1) / 2), w.y - ((w.height - 1) / 2),w.width,w.height);
@@ -242,6 +244,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			}
 		}
 		if(rect != null){
+			//Splits up the rectangle(wall) into 4 lines, then finds which 1-2 it intersects, finally finds the closest of those and crops laser
 			Line2D[] lines = new Line2D[4];
 			Line2D[] intLines = new Line2D[2];
 			Point2D[] intPoints = new Point2D[2];
@@ -264,10 +267,11 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			for(int i = 0; i < f ; i++){
 				intPoints[i] = GameMath.getIntersect(cLaser, intLines[i]);
 			}
-			System.out.println(intPoints[0] + " " + intPoints[1]);
 			if(intPoints[1] == null || GameMath.getDistance(player.getPoint(), intPoints[1]) > GameMath.getDistance(player.getPoint(), intPoints[0])){
 				cLaser.setLine(cLaser.getP1(),intPoints[0]);
 			}
+			// If player is shooting through wall and temporarily passes the wall's boundaries it will have 0 intersections 
+			// but still be in the wall so a null check is needed
 			else if (intPoints[0] != null){
 				cLaser.setLine(cLaser.getP1(),intPoints[1]);
 			}
@@ -443,7 +447,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			for(Entity cEntity : tempArray){
 				if(!cEntity.dead){
 					if(laser.intersects(new Rectangle((int)cEntity.x - ((cEntity.width - 1) / 2), (int)cEntity.y - ((cEntity.height - 1) / 2), 	cEntity.width, cEntity.height))){
-						cEntity = player.attackEntity(cEntity);
+						cEntity.damage(2);
+						particleArray.addAll(Effects.explode(cEntity.x, cEntity.y, Color.green, 1,4));
 						if(cEntity.dead){
 							particleArray.addAll(cEntity.onDeath());
 						}

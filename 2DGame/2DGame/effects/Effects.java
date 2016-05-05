@@ -14,8 +14,10 @@ public class Effects {
 		return explode(x,y,c,100);
 	}
 	public static ArrayList<ParticleBasic> explode(double x, double y, Color c, int pNum){
+		return explode(x,y,c,pNum,20);
+	}
+	public static ArrayList<ParticleBasic> explode(double x, double y, Color c, int pNum, int speed){
 		Random rand = new Random();
-		int speed = 20;
 		ArrayList<ParticleBasic> pArray = new ArrayList<ParticleBasic>();
 		for(int i = 0; i < pNum; i ++){
 			pArray.add(new ParticleBasic(x,y,(rand.nextDouble() * speed) - (speed / 2),(rand.nextDouble() * speed) - speed / 2,c));
