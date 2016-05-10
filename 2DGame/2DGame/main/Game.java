@@ -171,7 +171,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void update(){
 		updateEffects();
 		player.updateControls(keySet);
-		//addBullets(player.shoot());
+		addBullets(player.shoot());
 		updateLasers();
 		updateMines();
 		updateAliens();
@@ -578,7 +578,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void mouseClicked(MouseEvent e) {}
 	@Override
 	public void mousePressed(MouseEvent e) {
-		player.click(new Point(e.getX(),e.getY()));
+		player.click(new Point(e.getX(),e.getY()),e.getButton());
 	}
 	@Override
 	public void mouseReleased(MouseEvent e) {}

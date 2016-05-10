@@ -2,6 +2,7 @@ package entities;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -20,7 +21,8 @@ public class Player extends Entity{
 	public boolean sprint;
 	public ControlSet controls;
 	int swordLength = 100;
-	public Point lastClick;
+	public Point lastLaser;
+	public Point lastShot;
 	public Entity target;
 	int MAX_AMMUNITION = 20;
 	int ammunition = 100;
@@ -92,22 +94,27 @@ public class Player extends Entity{
 		}
 		return new Line2D.Double(p.x, p.y, x, y);
 	}
-	public void click(Point click){
-		this.lastClick = click;
+	public void click(Point click,int e){
+		if(e == MouseEvent.BUTTON1){
+			lastShot = click;
+		}
+		else if(e == MouseEvent.BUTTON3){
+			lastLaser = click;
+		}
 	}
 	public ArrayList<Bullet> shoot(){
 		ArrayList<Bullet> bArray = new ArrayList<Bullet>();
 		if(!dead && ammunition > 0){
-			if(lastClick == null){
+			if(lastShot == null){
 				return null;
 			}
 			ammunition--;
 			double speedX = 0,speedY = 0,angle = 0;
-			angle = Math.atan2(lastClick.y - y, lastClick.x - x);
+			angle = Math.atan2(lastShot.y - y, lastShot.x - x);
 			angle += (rand.nextDouble() - 0.5) * 0.3;
 			speedX = 2.0 * Math.cos(angle);
 			speedY = 2.0 * Math.sin(angle);
-			lastClick = null;
+			lastShot = null;
 			bArray.add(new Bullet((int)x,(int)y,speedX,speedY));
 		}
 		else{
@@ -117,14 +124,14 @@ public class Player extends Entity{
 	}
 	public Laser laser(){
 		laserTimer--;
-		if(!dead && laserTimer < 1 && ammunition > 5){
-			if(lastClick == null){
+		if(!dead && laserTimer < 1 && ammunition >= 5){
+			if(lastLaser == null){
 				return null;
 			}
 			ammunition -= 5;
 			laserTimer = laserTimerMax;
-			Laser l = new Laser(x, y, lastClick.getX(), lastClick.getY());
-			lastClick = null;
+			Laser l = new Laser(x, y, lastLaser.getX(), lastLaser.getY());
+			lastLaser = null;
 			return l;
 		}
 		return null;
@@ -132,7 +139,7 @@ public class Player extends Entity{
 	public void respawn(int x, int y){
 		super.respawn(x, y);
 		sprintCharge = TOTAL_SPRINT;
-		this.ammunition = 20;
+		this.ammunition = 100;
 	}
 
 }
