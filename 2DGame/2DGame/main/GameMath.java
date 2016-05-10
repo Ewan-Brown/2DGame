@@ -23,17 +23,18 @@ public class GameMath {
 	public static Point2D getIntersect(Line2D l1, Line2D l2){
 		double m1 = (l1.getY2() - l1.getY1()) / (l1.getX2() - l1.getX1());
 		double m2 = (l2.getY2() - l2.getY1()) / (l2.getX2() - l2.getX1());
+		//XXX Stupid infinity!
 		if(m1 == Double.NEGATIVE_INFINITY){
-			m1 = - 10000;
+			m1 = - 100000;
 		}
 		if(m1 == Double.POSITIVE_INFINITY){
-			m1 = 10000;
+			m1 = 100000;
 		}
 		if(m2 == Double.NEGATIVE_INFINITY){
-			m2 = -10000;
+			m2 = -100000;
 		}
 		if(m2 == Double.POSITIVE_INFINITY){
-			m2 = 10000;
+			m2 = 100000;
 		}
 		Point2D p1 = l1.getP2();
 		Point2D p2 = l2.getP2();

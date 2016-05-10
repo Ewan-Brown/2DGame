@@ -27,6 +27,7 @@ import entities.Alien;
 import entities.Bullet;
 import entities.Entity;
 import entities.LandMine;
+import entities.Laser;
 import entities.Player;
 import entities.Target;
 import entities.Wall;
@@ -58,6 +59,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public ArrayList<LandMine> mineArray = new ArrayList<LandMine>();
 	public ArrayList<Wall> wallArray = new ArrayList<Wall>();
 	public ArrayList<BasicPowerup> powerupArray = new ArrayList<BasicPowerup>();	
+	public ArrayList<Laser> laserArray = new ArrayList<Laser>();
 	ParticleBasic cParticle;
 	Random rand;
 	int wallSpawnCounter = 0;
@@ -74,6 +76,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		startGame();
 	}
 	public void startGame(){
+		laserArray.clear();
 		wallArray.clear();
 		bulletArray.clear();
 		alienArray.clear();
@@ -93,6 +96,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		playerArray.add(player);
 	}
 	public void nextLevel(){
+		laserArray.clear();
 		mineArray.clear();
 		bulletArray.clear();
 		alienArray.clear();
@@ -165,12 +169,10 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		}
 	}
 	public void update(){
-		//		slide();
-		//		shrinkWalls();
 		updateEffects();
 		player.updateControls(keySet);
-		//		addBullets(player.shoot());
-		laser();
+		//addBullets(player.shoot());
+		updateLasers();
 		updateMines();
 		updateAliens();
 		updateTargets();
@@ -198,7 +200,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D) g;
-		drawLaser(g2);
+		drawLasers(g2);
 		drawEffects(g2);
 		drawEntities(g2);
 		g.setColor(Color.white);
@@ -218,25 +220,28 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		}
 		return a;
 	}
-	public void drawLaser(Graphics2D g2){
-		Line2D laser = player.laser();
-		if(laser != null){
-			laser = cropLaser(laser);
-			g2.setColor(player.color);
-			g2.draw(laser);
+	public void drawLasers(Graphics2D g2){
+		for(Laser laser : laserArray){
+			g2.setColor(laser.color);
+			g2.draw(laser.getLine());
 		}
 	}
-	public Line2D cropLaser(Line2D laser){
-		Line2D cLaser = laser;
+	public Laser cropLaser(Laser laser){
+		Line2D line = laser.getLine();
+		double x = line.getX2() - line.getX1();
+		double y = line.getY2() - line.getY1();
+		line.setLine(line.getX1(), line.getY1(), line.getX2() + x * 2000, line.getY2() + y * 2000);
 		Rectangle2D rect = null;
 		Rectangle2D r;
 		Wall w;
+		double m = (line.getY2() - line.getY1()) / (line.getX2() - line.getX1());
+		double b = line.getY1() - (m * line.getX1());;
 		double prevDist = 9999999;
 		//Goes through all walls that laser intersects, and finds the closest one
 		for(int i = 0; i < wallArray.size();i++){
 			w = wallArray.get(i);
 			r = new Rectangle2D.Double(w.x - ((w.width - 1) / 2), w.y - ((w.height - 1) / 2),w.width,w.height);
-			if(cLaser.intersects(r)){
+			if(line.intersects(r)){
 				if(GameMath.getDistance(player, w) < prevDist){
 					prevDist = GameMath.getDistance(player, wallArray.get(i));
 					rect = r;
@@ -244,10 +249,10 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			}
 		}
 		if(rect != null){
-			//Splits up the rectangle(wall) into 4 lines, then finds which 1-2 it intersects, finally finds the closest of those and crops laser
+			//Splits up the rectangle(wall) into 4 lines, then finds which 1-2(4 for exceptions!) it intersects, finally finds the closest of those and crops laser
 			Line2D[] lines = new Line2D[4];
-			Line2D[] intLines = new Line2D[2];
-			Point2D[] intPoints = new Point2D[2];
+			Line2D[] intLines = new Line2D[4];
+			Point2D[] intPoints = new Point2D[4];
 			Point2D[] p = new Point2D[4];
 			p[0] = new Point2D.Double(rect.getX(),rect.getY());
 			p[1] = new Point2D.Double(rect.getX() + rect.getWidth(),rect.getY());
@@ -259,24 +264,25 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			lines[3] = new Line2D.Double(p[3], p[0]);
 			int f = 0;
 			for(int i = 0; i < 4;i++){
-				if(lines[i].intersectsLine(cLaser)){
+				if(lines[i].intersectsLine(line)){
 					intLines[f] = lines[i];
 					f++;
 				}
 			}
 			for(int i = 0; i < f ; i++){
-				intPoints[i] = GameMath.getIntersect(cLaser, intLines[i]);
+				intPoints[i] = GameMath.getIntersect(line, intLines[i]);
 			}
 			if(intPoints[1] == null || GameMath.getDistance(player.getPoint(), intPoints[1]) > GameMath.getDistance(player.getPoint(), intPoints[0])){
-				cLaser.setLine(cLaser.getP1(),intPoints[0]);
+				line.setLine(line.getP1(),intPoints[0]);
 			}
 			// If player is shooting through wall and temporarily passes the wall's boundaries it will have 0 intersections 
 			// but still be in the wall so a null check is needed
 			else if (intPoints[0] != null){
-				cLaser.setLine(cLaser.getP1(),intPoints[1]);
+				line.setLine(line.getP1(),intPoints[1]);
 			}
 		}
-		return cLaser;
+		laser.setLine(line);
+		return laser;
 	}
 	public void drawEffects(Graphics g){
 		Particle cParticle;
@@ -434,11 +440,20 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			}
 		}
 	}
-	public void laser(){
-		Line2D laser = player.laser();
-		if (laser != null){
-			laser = cropLaser(laser);
-			cropLaser(laser);
+	public void updateLasers(){
+		Laser l = player.laser();
+		if(l != null){
+			l = cropLaser(l);
+			laserArray.add(l);
+		}
+		Laser cLaser;
+		for(int i = 0; i < laserArray.size();i++){
+			cLaser = laserArray.get(i);
+			cLaser.update();
+			if(cLaser.dead){
+				laserArray.remove(i);
+			}
+			Line2D line = cLaser.getLine();
 			ArrayList<Entity> tempArray = new ArrayList<Entity>();
 			tempArray.addAll(this.alienArray);
 			tempArray.addAll(this.bulletArray);
@@ -446,7 +461,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			tempArray.addAll(this.targetArray);
 			for(Entity cEntity : tempArray){
 				if(!cEntity.dead){
-					if(laser.intersects(new Rectangle((int)cEntity.x - ((cEntity.width - 1) / 2), (int)cEntity.y - ((cEntity.height - 1) / 2), 	cEntity.width, cEntity.height))){
+					if(line.intersects(new Rectangle((int)cEntity.x - ((cEntity.width - 1) / 2), (int)cEntity.y - ((cEntity.height - 1) / 2), 	cEntity.width, cEntity.height))){
 						cEntity.damage(2);
 						particleArray.addAll(Effects.explode(cEntity.x, cEntity.y, Color.green, 1,4));
 						if(cEntity.dead){

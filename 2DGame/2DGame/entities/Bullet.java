@@ -11,6 +11,7 @@ public class Bullet extends EntityAI{
 
 	double deltaX;
 	double deltaY;
+	boolean pierce = true;
 	public Bullet(int x, int y, double dX, double dY) {
 		super(x, y,Color.PINK);
 		this.color = Color.PINK;
@@ -31,6 +32,13 @@ public class Bullet extends EntityAI{
 	public  ArrayList<? extends ParticleBasic> onWallCollide(){
 		this.dead = true;
 		return Effects.explode(x, y, color, 3);
+	}
+	public Entity attackEntity(Entity e){
+		e = super.attackEntity(e);
+		if(!pierce){
+			this.dead = true;
+		}
+		return e;
 	}
 	public ArrayList<? extends Particle> onDeath(){
 		return new ArrayList<ParticleBasic>();

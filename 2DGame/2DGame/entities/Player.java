@@ -23,7 +23,9 @@ public class Player extends Entity{
 	public Point lastClick;
 	public Entity target;
 	int MAX_AMMUNITION = 20;
-	int ammunition = 20;
+	int ammunition = 100;
+	int laserTimerMax = 10;
+	int laserTimer;
 	public Player(int x, int y,Color c,ControlSet controls) {
 		super(x,y,c);
 		maxHealth = 1000;
@@ -34,6 +36,7 @@ public class Player extends Entity{
 		name = "PLAYER";
 		this.height = 10;
 		this.width = 10;
+		laserTimer = laserTimerMax;
 	}
 	public void moveEntity(double x, double y){
 		if(sprint){
@@ -112,13 +115,17 @@ public class Player extends Entity{
 		}
 		return bArray;
 	}
-	public Line2D laser(){
-		if(!dead){
+	public Laser laser(){
+		laserTimer--;
+		if(!dead && laserTimer < 1 && ammunition > 5){
 			if(lastClick == null){
 				return null;
 			}
-			Line2D laser = new Line2D.Double(x, y, lastClick.getX(), lastClick.getY());
-			return laser;
+			ammunition -= 5;
+			laserTimer = laserTimerMax;
+			Laser l = new Laser(x, y, lastClick.getX(), lastClick.getY());
+			lastClick = null;
+			return l;
 		}
 		return null;
 	}
