@@ -4,13 +4,15 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
 
+import effects.Effects;
+import effects.Particle;
 import main.GameMath;
 
 public class Missile extends EntityAI{
 
-	int MAX_EXPLODE_TIMER = 300;
+	int MAX_EXPLODE_TIMER = 700;
 	int explodeTimer = MAX_EXPLODE_TIMER;
-	int bullets = 200;
+	int bullets = 500;
 	double dirAngle;
 	public Missile(double x, double y,double speedX,double speedY) {
 		super(x, y, Color.RED);
@@ -18,7 +20,7 @@ public class Missile extends EntityAI{
 		deltaY = speedY;
 		width = 5;
 		height = 5;
-		speed = 0.7;
+		speed = 2;
 		targetAngle = 0;
 		dirAngle = targetAngle;
 	}
@@ -43,17 +45,22 @@ public class Missile extends EntityAI{
 			}
 		}
 	}
+	public ArrayList<? extends Particle> onDeath(){
+		this.deadColor();
+		return new ArrayList<Particle>();
+	}
 	public void moveAI(){
 		targetAngle = Math.atan2(target.y - y, target.x - x);
 		double diff = dirAngle - targetAngle;
 		diff = (diff + 3 * Math.PI) %(2 * Math.PI) - Math.PI;
 		System.out.println(diff);
-		dirAngle -= diff / 30;
+		dirAngle -= diff / 50;
 		deltaX = speed * Math.cos(dirAngle);
 		deltaY = speed * Math.sin(dirAngle);
 		explodeTimer--;
 		if(explodeTimer < 0){
 			this.dead = true;
+			this.onDeath();
 		}
 		x += deltaX;
 		y += deltaY;
