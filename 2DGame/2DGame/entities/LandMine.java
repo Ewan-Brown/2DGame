@@ -7,9 +7,9 @@ import java.util.Random;
 public class LandMine extends Entity{
 	
 	int timer = 300;
-	int bullets = 15;
+	int bullets = 200;
 
-	public LandMine(int x, int y) {
+	public LandMine(double x, double y) {
 		super(x, y,Color.MAGENTA);
 	}
 	public void tick(){
@@ -23,7 +23,7 @@ public class LandMine extends Entity{
 		ArrayList<Bullet> p = new ArrayList<Bullet>();
 		Random rand = new Random();
 		for(int i = 0; i < bullets; i++){
-			p.add(new Bullet((int)x,(int)y,(rand.nextDouble() - 0.5) * 3 + 1,(rand.nextDouble() - 0.5) * 3 + 1));
+			p.add(new Bullet((int)x,(int)y,(rand.nextDouble() - 0.5) * 10 ,(rand.nextDouble() - 0.5) * 10,this));
 		}
 
 		return p;

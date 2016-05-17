@@ -11,9 +11,11 @@ public class Bullet extends EntityAI{
 
 	double deltaX;
 	double deltaY;
+	Entity owner;
 	boolean pierce = true;
-	public Bullet(int x, int y, double dX, double dY) {
+	public Bullet(double x, double y, double dX, double dY, Entity e) {
 		super(x, y,Color.PINK);
+		owner = e;
 		this.color = Color.PINK;
 		this.width = 3;
 		this.height = 3;
@@ -34,9 +36,13 @@ public class Bullet extends EntityAI{
 		return Effects.explode(x, y, color, 3);
 	}
 	public Entity attackEntity(Entity e){
-		e = super.attackEntity(e);
+		
+		//TODO XXX IF E == CLASS INSTANCE OF OWNER, DONT DO ANYTHING!
 		if(!pierce){
 			this.dead = true;
+		}
+		if(!(e.getClass() == owner.getClass())){
+			super.attackEntity(e);
 		}
 		return e;
 	}

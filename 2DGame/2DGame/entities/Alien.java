@@ -12,15 +12,13 @@ public class Alien extends EntityAI {
 	double angle;
 	int COOLDOWN = 50;
 	int cooldownTimer = 250;
-	Random rand;
 	final double SHOTGUN_CHOKE = 0.08;
 	double shotAccuracy = 0.1;
 
-	public Alien(int x, int y) {
+	public Alien(double x, double y) {
 		super(x, y,Color.RED);
 		this.width = 10;
 		this.height = 10;
-		rand = new Random();
 		this.speed = 1;
 	}
 	public void updateTarget(ArrayList<Entity> friendlyArray) {
@@ -51,12 +49,14 @@ public class Alien extends EntityAI {
 		return bArray;
 	}
 	public Bullet shoot(){
-		double speedX,speedY;
-		angle = Math.atan2(target.y - y, target.x - x) + ((rand.nextDouble() - 0.5) * shotAccuracy);
-		speedX = 2.0 * Math.cos(angle);
-		speedY = 2.0 * Math.sin(angle);
-		return new Bullet((int)x,(int)y,speedX,speedY);
-//		return null;
+		if(target != null){
+			double speedX,speedY;
+			angle = Math.atan2(target.y - y, target.x - x) + ((rand.nextDouble() - 0.5) * shotAccuracy);
+			speedX = 2.0 * Math.cos(angle);
+			speedY = 2.0 * Math.sin(angle);
+			return new Bullet((int)x,(int)y,speedX,speedY,this);
+		}
+		return null;
 	}
 	public ArrayList<Bullet> shotgun(){
 		ArrayList<Bullet> bArray = new ArrayList<Bullet>();
@@ -66,7 +66,7 @@ public class Alien extends EntityAI {
 		for(int i = 0; i < 3;i++){
 			speedX = 2.0 * Math.cos(angle);
 			speedY = 2.0 * Math.sin(angle);
-			bArray.add(new Bullet((int)x,(int)y,speedX,speedY));
+			bArray.add(new Bullet((int)x,(int)y,speedX,speedY,this));
 			angle += SHOTGUN_CHOKE;
 		}
 		return bArray;

@@ -21,15 +21,17 @@ public class Entity {
 	public Color color;
 	public Color baseColor;
 	Random rand;
-	public Entity(int x, int y,Color c){
+	public Entity(double x, double y,Color c){
 		name = "NULL";
+		rand = new Random();
 		this.x = x;
 		this.y = y;
-		this.health = 100;
+		this.health = maxHealth;
 		color = c;
 		baseColor = c;
+		rand = new Random();
 	}
-	public void respawn(int x, int y){
+	public void respawn(double x, double y){
 		this.x = x;
 		this.y = y;
 		this.dead = false;

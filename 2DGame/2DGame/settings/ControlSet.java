@@ -63,7 +63,7 @@ public class ControlSet {
 			speed = 0.5;
 		}
 		if(speed > 20){
-			speed = 40;
+			speed = 20;
 		}
 	}
 	public double getX(){

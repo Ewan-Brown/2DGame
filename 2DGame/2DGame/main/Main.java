@@ -1,8 +1,8 @@
 package main;
 
 import java.awt.Dimension;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -25,7 +25,7 @@ public class Main{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		start();		
+		start();	
 	}
 	public static void updateControls() throws IOException{
 		List<String> text = TextFileReader.readFile("Controls.text");
@@ -49,7 +49,7 @@ public class Main{
 			panel.update();
 
 			try {
-				Thread.sleep(10);
+				Thread.sleep(7);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

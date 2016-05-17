@@ -22,12 +22,13 @@ import javax.swing.JPanel;
 
 import effects.Effects;
 import effects.Particle;
-import effects.ParticleBasic;
 import entities.Alien;
+import entities.Breeder;
 import entities.Bullet;
 import entities.Entity;
 import entities.LandMine;
 import entities.Laser;
+import entities.Missile;
 import entities.Player;
 import entities.Target;
 import entities.Wall;
@@ -41,16 +42,25 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	 */
 	private static final long serialVersionUID = 1L;
 	public final DecimalFormat df = new DecimalFormat("#.##");
+	//config settings
 	int slideSpeed = 2;
 	int wallShrinkCount = 10;
 	int WALL_SHRINK_MAX = 3;
 	Player player;
 	public double safeSpawnDistance = 200;
-	int aliens = 10;
+	int aliens = 0;
 	int walls = 15;
+	//used to keep from spawning things outside of frame!
 	int panelWidth;
 	int panelHeight;
+	/* A set of bits, each bit representing a possible character from the keyboard. When one is detected to be pressed,
+	 * that key is flipped ON, and if that key is released, the equivilant bit is flipped OFF.
+	 * The number-key reference used is from the KeyEvent class.
+	 */
 	BitSet keySet = new BitSet(256);
+	//Arraylists for each kind of entity, and one for particles.
+	//TODO make this less messy somehow?
+	public ArrayList<Breeder> breederArray = new ArrayList<Breeder>();
 	public ArrayList<Particle> particleArray = new ArrayList<Particle>();
 	public ArrayList<Alien> alienArray = new ArrayList<Alien>();
 	public ArrayList<Player> playerArray = new ArrayList<Player>();
@@ -60,22 +70,29 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public ArrayList<Wall> wallArray = new ArrayList<Wall>();
 	public ArrayList<BasicPowerup> powerupArray = new ArrayList<BasicPowerup>();	
 	public ArrayList<Laser> laserArray = new ArrayList<Laser>();
-	ParticleBasic cParticle;
+	public ArrayList<Missile> missileArray = new ArrayList<Missile>();
+	//A Random instantiation used for spawning and other random things.
+	//TODO should this be a method wide variable, seeing as global use has no benefit?
 	Random rand;
-	int wallSpawnCounter = 0;
+	//The constructor, for initializing the JPanel settings and fitting it in frame
 	public Game(int w, int h,ControlSet controls[]){
 		rand = new Random();
+		//XXX weird hack to keep JPanel in the JFrame
 		setPreferredSize(new Dimension(w,h));
-		this.setFocusable(true);
+		///
+		setFocusable(true);
 		addKeyListener(this);
 		addMouseListener(this);
 		panelWidth = w;
 		panelHeight = h;
 		player = new Player(panelWidth / 2, panelHeight / 2,Color.GREEN,controls[0]);
-		this.setBackground(Color.BLACK);
+		setBackground(Color.BLACK);
 		startGame();
 	}
+	//Called when game first starts, and every time a 'game-over' occurs(when player dies)
+	//Clears all entities then spawns in new ones
 	public void startGame(){
+		//Clearing all entites
 		laserArray.clear();
 		wallArray.clear();
 		bulletArray.clear();
@@ -84,50 +101,65 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		targetArray.clear();
 		mineArray.clear();
 		powerupArray.clear();
-		powerupArray.add(new BasicPowerup(400,500));
+		breederArray.clear();
+		//XXX Temporary testing Missile
+		missileArray.add(new Missile(300,300, 1, 1));
+		//TODO Should player be RESPAWNED, or RECREATED?
 		player.respawn(panelWidth / 2, panelHeight / 2);
-
+		
+		//Spawning the requested amount of Aliens and Walls
 		for(int i = 0; i < aliens; i++){
 			spawnAlien();
 		}
 		for(int i = 0; i < walls; i++){
 			spawnWall();
 		}
+		//This does not CREATE player, but instead places the player in an array that can be accessed by AI-Targetting or other such things
 		playerArray.add(player);
 	}
+	//Called when player wins! Most entities are cleared, except for walls
 	public void nextLevel(){
 		laserArray.clear();
 		mineArray.clear();
 		bulletArray.clear();
 		alienArray.clear();
 		targetArray.clear();
+		breederArray.clear();
+		missileArray.clear();
+		//Spawns requested amount of aliens
 		for(int i = 0; i < aliens; i++){
 			spawnAlien();
 			//			spawnTarget();
 		}
 	}
+	//Method to spawn a wall, with random dimensions(with limits) in a random location
 	public void spawnWall(){
+		//Added the '+10' for the dimensions so that the walls would not be too small, allowing entites to pass through objects
 		wallArray.add(new Wall(rand.nextInt(panelWidth),rand.nextInt(panelHeight),rand.nextInt(100) + 10,rand.nextInt(100) + 10));
 
 	}
+	//Method to spawn a mine, in a random location
 	public void spawnMine(){
 		mineArray.add(new LandMine(rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 	}
+	//Method to spawn an alien, in a random location but atleast a certain distance from the player.
 	public void spawnAlien(){
 		Alien cAlien;
-		//XXX stupid loop
+		//XXX hack-loop respawns alien continually in random locations until a 'safe' spot is chosen.
 		do{
 			cAlien = new Alien(rand.nextInt(panelWidth),rand.nextInt(panelHeight));
 		}while(GameMath.getDistance(cAlien, player) < safeSpawnDistance);
 		alienArray.add(cAlien);
 	}
+	//Method to spawn a target in a random location
 	public void spawnTarget(){
 		targetArray.add(new Target(rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
 	}
+	//Slides all the stationary objects(Walls/powerups) 1 unit to the left,
+	//Removes these if they exit the left side of the game.
 	public void slide(){
-		ArrayList<Wall> tempArray = new ArrayList<Wall>();
-		tempArray.addAll(wallArray);
 		Wall w;
+		//Separate methods needed because they need to be removed from their respected arrays.
 		for(int i = 0; i < wallArray.size(); i++){
 			w = wallArray.get(i);
 			w.x -= slideSpeed;
@@ -136,23 +168,36 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 				spawnWall();
 			}
 		}
-		ArrayList<Entity> tempArray2 = new ArrayList<Entity>();
-		tempArray2.addAll(playerArray);
-		tempArray2.addAll(alienArray);
-		tempArray2.addAll(targetArray);
-		tempArray2.addAll(mineArray);
-		for(Entity e : tempArray2){
+		BasicPowerup bp;
+		for(int i = 0; i < powerupArray.size();i++){
+			bp = powerupArray.get(i);
+			bp.x -= slideSpeed;
+			if(bp.getRightSide() < 0){
+				powerupArray.remove(i);
+				spawnWall();
+			}
+		}
+		//Kills entites if they go too far off the left side of the game.
+		ArrayList<Entity> tempArray = new ArrayList<Entity>();
+		tempArray.addAll(playerArray);
+		tempArray.addAll(alienArray);
+		tempArray.addAll(targetArray);
+		tempArray.addAll(mineArray);
+		for(Entity e : tempArray){
 			if(e.getRightSide() < 0){
+				//TODO Why call this method? doesn't make sense
 				e.onEntityCollision();
 			}
 		}		
 	}
+	//Shrinks all the walls by one unit Width and Height.
+	//If walls get too small, they are removed and a new one is spawned in.
 	public void shrinkWalls(){
 		ArrayList<Wall> tempArray = new ArrayList<Wall>();
 		tempArray.addAll(wallArray);
 		Wall w;
+		//XXX Counter to slow down how fast the walls shrink
 		wallShrinkCount--;
-		//XXX Stupid counter crap
 		for(int i = 0; i < wallArray.size();i++){
 			w = wallArray.get(i);
 			if(wallShrinkCount < 1){
@@ -168,25 +213,32 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			wallShrinkCount = WALL_SHRINK_MAX;
 		}
 	}
+	//'TICK' of the game. Called continually by the 'main loop'.
+	//Updates all Entities and then calls a repaint on the game window.
 	public void update(){
 		updateEffects();
 		player.updateControls(keySet);
 		addBullets(player.shoot());
+		addMine(player.mine());
 		updateLasers();
 		updateMines();
 		updateAliens();
 		updateTargets();
 		updateBullets();
+		updateBreeders();
+		updateMissiles();
 		checkCollisions();
 		checkObstacleCollisions();
+		//Checks if the game has been lost or won, and then proceeds to either game-over or next-level
 		if(checkGameWin()){
 			nextLevel();
 		}
 		if(checkGameLose()){
 			startGame();
 		}
-		this.repaint();
+		repaint();
 	}
+	//Updates particle logic
 	public void updateEffects(){
 		for(int i = 0; i < particleArray.size();i++){
 			if(particleArray.get(i).dead){
@@ -207,9 +259,12 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		g.drawString(particleArray.size()+"", panelWidth / 2, panelHeight / 2);
 		g2.setColor(Color.BLACK);
 	}
+	//Returns the amount of enemies and hostile entities alive
 	public int enemiesAlive(){
 		int a = 0;
 		ArrayList<Entity> tempArray = new ArrayList<Entity>();
+		tempArray.addAll(breederArray);
+		tempArray.addAll(missileArray);
 		tempArray.addAll(alienArray);
 		tempArray.addAll(mineArray);
 		tempArray.addAll(bulletArray);
@@ -226,6 +281,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			g2.draw(laser.getLine());
 		}
 	}
+	//Takes a 'laser' after a click from the player, crops it appropiately if it is intersecting a wall, and then makes it much longer so
+	//that it appears to be infinitely long.
 	public Laser cropLaser(Laser laser){
 		Line2D line = laser.getLine();
 		double x = line.getX2() - line.getX1();
@@ -234,8 +291,6 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		Rectangle2D rect = null;
 		Rectangle2D r;
 		Wall w;
-		double m = (line.getY2() - line.getY1()) / (line.getX2() - line.getX1());
-		double b = line.getY1() - (m * line.getX1());;
 		double prevDist = 9999999;
 		//Goes through all walls that laser intersects, and finds the closest one
 		for(int i = 0; i < wallArray.size();i++){
@@ -292,11 +347,13 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			g.fillRect((int)cParticle.x, (int)cParticle.y, 2, 2);
 		}
 	}
+	//Main entity-drawing method.
 	public void drawEntities(Graphics2D g2){
 		ArrayList<Entity> tempArray = new ArrayList<Entity>();
 		tempArray.addAll(alienArray);
 		tempArray.addAll(playerArray);
 		tempArray.addAll(targetArray);
+		tempArray.addAll(breederArray);
 		for(Entity e : tempArray){
 			drawHealthBar(g2,e);
 		}
@@ -304,6 +361,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		tempArray.addAll(bulletArray);
 		tempArray.addAll(wallArray);
 		tempArray.addAll(powerupArray);
+		tempArray.addAll(missileArray);
 		for(Entity e : tempArray){
 			drawEntity(g2,e);
 		}
@@ -317,6 +375,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		g.setColor(e.color);
 		g.fillRect((int)e.x - ((e.width - 1) / 2), (int)e.y - ((e.height - 1) / 2), 	e.width, e.height);
 	}
+	//Draws a health bar below entities
 	public void drawHealthBar(Graphics g, Entity e){
 		g.setColor(e.color);
 		double health = e.health;
@@ -341,16 +400,44 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			cTarget.moveAI();
 		}
 	}
-	public void updateAliens(){
-		for(Alien cAlien : alienArray){
-			ArrayList<Entity> tempArray = new ArrayList<Entity>();
-			tempArray.addAll(playerArray);
-			tempArray.addAll(targetArray);
-			cAlien.updateTarget(tempArray);
-			cAlien.moveAI();
-			addBullets(cAlien.tryShoot());
+	public void updateMissiles(){
+		for(Missile missile : missileArray){
+			if(!missile.dead){
+				missile.updateTarget(playerArray);
+				missile.moveAI();
+				if(missile.dead){
+					bulletArray.addAll(missile.explode());
+				}
+			}
 		}
 	}
+	public void updateBreeders(){
+		Alien cAlien;
+		for(Breeder cBreeder : breederArray){
+			if(!cBreeder.dead){
+				cAlien = cBreeder.spawnAlien();
+				if(cAlien != null){
+					alienArray.add(cAlien);
+				}
+				cBreeder.moveAI();
+				cBreeder.updateTarget(playerArray);
+
+			}
+		}
+	}
+	public void updateAliens(){
+		ArrayList<Entity> tempArray = new ArrayList<Entity>();
+		tempArray.addAll(playerArray);
+		tempArray.addAll(targetArray);
+		for(Alien cAlien : alienArray){
+			if(!cAlien.dead){
+				cAlien.updateTarget(tempArray);
+				cAlien.moveAI();
+				addBullets(cAlien.tryShoot());
+			}
+		}
+	}
+	//Methods to add bullets and mines to the game, needed so that null things are accidentally put in because then things go BOOM :(
 	public void addBullet(Bullet cBullet){
 		if(cBullet != null){
 			bulletArray.add(cBullet);
@@ -363,6 +450,11 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 					bulletArray.add(cBullet);
 				}
 			}
+		}
+	}
+	public void addMine(LandMine cMine){
+		if(cMine != null){
+			mineArray.add(cMine);
 		}
 	}
 	public void updateBullets(){
@@ -455,10 +547,10 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			}
 			Line2D line = cLaser.getLine();
 			ArrayList<Entity> tempArray = new ArrayList<Entity>();
-			tempArray.addAll(this.alienArray);
-			tempArray.addAll(this.bulletArray);
-			tempArray.addAll(this.mineArray);
-			tempArray.addAll(this.targetArray);
+			tempArray.addAll(alienArray);
+			tempArray.addAll(bulletArray);
+			tempArray.addAll(mineArray);
+			tempArray.addAll(targetArray);
 			for(Entity cEntity : tempArray){
 				if(!cEntity.dead){
 					if(line.intersects(new Rectangle((int)cEntity.x - ((cEntity.width - 1) / 2), (int)cEntity.y - ((cEntity.height - 1) / 2), 	cEntity.width, cEntity.height))){
@@ -474,11 +566,12 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	}
 	public void checkObstacleCollisions(){
 		ArrayList<Entity> allEntities = new ArrayList<Entity>();
-		allEntities.addAll(this.alienArray);
-		allEntities.addAll(this.bulletArray);
-		allEntities.addAll(this.mineArray);
-		allEntities.addAll(this.playerArray);
-		allEntities.addAll(this.targetArray);
+		allEntities.addAll(alienArray);
+		allEntities.addAll(bulletArray);
+		allEntities.addAll(mineArray);
+		allEntities.addAll(playerArray);
+		allEntities.addAll(targetArray);
+		allEntities.addAll(breederArray);
 		double l,r,u,d;
 		double l2,r2,u2,d2;
 		int minIndex;
@@ -555,6 +648,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		tempArray.addAll(alienArray);
 		tempArray.addAll(mineArray);
 		tempArray.addAll(bulletArray);
+		tempArray.addAll(missileArray);
+		tempArray.addAll(breederArray);
 		for(Entity cEntity : tempArray){
 			if(cEntity.dead == false){
 				return false;

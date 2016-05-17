@@ -9,7 +9,7 @@ import main.GameMath;
 
 public class Target extends EntityAI{
 	boolean sX,sY;
-	public Target(int x, int y) {
+	public Target(double x, double y) {
 		super(x, y,Color.white);
 	}
 	public void updateTarget(ArrayList<Alien> alienArray) {
