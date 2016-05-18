@@ -103,7 +103,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		powerupArray.clear();
 		breederArray.clear();
 		//XXX Temporary testing Missile
-		missileArray.add(new Missile(300,300, 1, 1));
+		missileArray.add(new Missile(300,300));
 		//TODO Should player be RESPAWNED, or RECREATED?
 		player.respawn(panelWidth / 2, panelHeight / 2);
 		

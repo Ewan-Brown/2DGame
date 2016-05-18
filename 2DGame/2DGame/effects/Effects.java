@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class Effects {
 
-	//TODO incorporate an enum so that it's easier to differ tham and looks cool
+	//TODO incorporate an enum so that it's easier to differ them and looks cool n stuff
 	public static enum particleType{
 		EXPLODE,SWIRLY,FIREWORKS,IMPLODE,FLIP;
 	}
@@ -32,17 +32,17 @@ public class Effects {
 		for(int i = 0; i < pNum; i ++){
 			pArray.add(new ParticleSwirly(x,y,(rand.nextDouble() * speed) - (speed / 2),(rand.nextDouble() * speed) - speed / 2,c));
 		}
-		//XXX Get rid of this?
-		pArray = (ArrayList<ParticleSwirly>) fireworks(pArray);
+		//XXX Inheritance issue with arraylists
+//		pArray = fireworks(pArray);
 		return pArray;
 	}
-	public static ArrayList<? extends Particle> fireworks(ArrayList<? extends Particle> array){
-		Random rand = new Random();
-		for(int i = 0; i < array.size(); i++){
-			array.get(i).color = new Color(rand.nextInt(255),rand.nextInt(255),rand.nextInt(255));
-		}
-		return array;
-	}
+//	public static ArrayList<? extends Particle> fireworks(ArrayList<? extends Particle> array){
+//		Random rand = new Random();
+//		for(int i = 0; i < array.size(); i++){
+//			array.get(i).color = new Color(rand.nextInt(255),rand.nextInt(255),rand.nextInt(255));
+//		}
+//		return array;
+//	}
 	public static ArrayList<ParticleImplode> implode(double x, double y, Color c){
 		int pNum = 100;
 		Random rand = new Random();
@@ -84,10 +84,15 @@ public class Effects {
 		double offset = 1.5;
 		double speedY2 = Math.cos(angle);
 		double speedX2 = Math.sin(angle);
+		//Without this, if speedY is 0, the angle found is vertical and so the particles' Y speed = -1
+		if(speedY == 0){
+			speedY2 = 0;
+		}
 		ArrayList<ParticleBasic> pArray = new ArrayList<ParticleBasic>();
 		for(int i = 0; i < pNum; i ++){
 			pArray.add(new ParticleBasic(x,y,speedX2 * 2 + ((rand.nextDouble() - 0.5) * offset),speedY2 * 2 + ((rand.nextDouble() - 0.5) * offset),c));
 		}
+		System.out.println(speedY2);
 		return pArray;
 	}
 	/*TODO

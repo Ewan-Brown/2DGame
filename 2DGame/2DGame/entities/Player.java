@@ -63,7 +63,6 @@ public class Player extends Entity{
 		double speedY = -controls.getY();
 		ArrayList<Particle> pArray = new ArrayList<Particle>();
 		pArray.addAll(Effects.shockwave(this.x, this.y,speedX,speedY, c));
-//		pArray.addAll(Effects.implode(x, y, c));
 		return pArray;
 
 	}

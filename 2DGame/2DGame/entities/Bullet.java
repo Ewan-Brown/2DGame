@@ -26,6 +26,10 @@ public class Bullet extends EntityAI{
 		this.y += 5 *deltaY;
 		
 	}
+	public Bullet(double x, double y, double dX, double dY, Entity e, int Damage){
+		this(x,y,dX,dY,e);
+		damage = Damage;
+	}
 	
 	public void moveAI(){
 		this.x += deltaX;
@@ -33,11 +37,10 @@ public class Bullet extends EntityAI{
 	}
 	public  ArrayList<? extends ParticleBasic> onWallCollide(){
 		this.dead = true;
-		return Effects.explode(x, y, color, 3);
+		return Effects.explode(x, y, Color.RED, 3);
 	}
 	public Entity attackEntity(Entity e){
 		
-		//TODO XXX IF E == CLASS INSTANCE OF OWNER, DONT DO ANYTHING!
 		if(!pierce){
 			this.dead = true;
 		}

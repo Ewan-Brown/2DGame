@@ -21,6 +21,7 @@ public class Entity {
 	public Color color;
 	public Color baseColor;
 	Random rand;
+	int damage = 10;
 	public Entity(double x, double y,Color c){
 		name = "NULL";
 		rand = new Random();
@@ -63,7 +64,7 @@ public class Entity {
 		}
 	}
 	public Entity attackEntity(Entity e){
-		e.damage(10);
+		e.damage(damage);
 		return e;
 	}
 	public ArrayList<? extends Particle> onDeath(){

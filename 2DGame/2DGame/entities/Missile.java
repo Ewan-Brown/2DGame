@@ -12,15 +12,15 @@ public class Missile extends EntityAI{
 
 	int MAX_EXPLODE_TIMER = 700;
 	int explodeTimer = MAX_EXPLODE_TIMER;
-	int bullets = 500;
+	int bullets = 5000;
 	double dirAngle;
-	public Missile(double x, double y,double speedX,double speedY) {
+	public Missile(double x, double y) {
 		super(x, y, Color.RED);
-		deltaX = speedX;
-		deltaY = speedY;
+		deltaX = 0;
+		deltaY = 0;
 		width = 5;
 		height = 5;
-		speed = 2;
+		speed = .8;
 		targetAngle = 0;
 		dirAngle = targetAngle;
 	}
@@ -28,7 +28,7 @@ public class Missile extends EntityAI{
 		ArrayList<Bullet> bArray = new ArrayList<Bullet>();
 		Random rand = new Random();
 		for(int i = 0; i < bullets; i++){
-			bArray.add(new Bullet(x,y,(rand.nextDouble() - 0.5) * 10 ,(rand.nextDouble() - 0.5) * 10,this));
+			bArray.add(new Bullet(x,y,(rand.nextDouble() - 0.5) * 10 ,(rand.nextDouble() - 0.5) * 10,this,20));
 		}
 		return bArray;
 	}
@@ -53,8 +53,10 @@ public class Missile extends EntityAI{
 		targetAngle = Math.atan2(target.y - y, target.x - x);
 		double diff = dirAngle - targetAngle;
 		diff = (diff + 3 * Math.PI) %(2 * Math.PI) - Math.PI;
-		System.out.println(diff);
-		dirAngle -= diff / 50;
+		if(diff > Math.PI){
+			System.out.println(diff);
+		}
+		dirAngle -= diff / 20;
 		deltaX = speed * Math.cos(dirAngle);
 		deltaY = speed * Math.sin(dirAngle);
 		explodeTimer--;
