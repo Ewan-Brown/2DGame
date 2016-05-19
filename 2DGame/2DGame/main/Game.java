@@ -64,6 +64,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	BitSet keySet = new BitSet(256);
 	//Arraylists for each kind of entity, and one for particles.
 	//TODO make this less messy somehow?
+	public ArrayList<Line2D> boundsArray = new ArrayList<Line2D>();
 	public ArrayList<Breeder> breederArray = new ArrayList<Breeder>();
 	public ArrayList<Particle> particleArray = new ArrayList<Particle>();
 	public ArrayList<Alien> alienArray = new ArrayList<Alien>();
@@ -89,9 +90,13 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		addMouseListener(this);
 		panelWidth = w;
 		panelHeight = h;
-		gameWidth = panelWidth * 2;
-		gameHeight = panelHeight * 2;
+		gameWidth = panelWidth + 100;
+		gameHeight = panelHeight + 100;
 		player = new Player(gameWidth / 2, gameHeight / 2,Color.GREEN,controls[0]);
+		boundsArray.add(new Line2D.Double(0,0,gameWidth,0));
+		boundsArray.add(new Line2D.Double(gameWidth,0,gameWidth, gameHeight));
+		boundsArray.add(new Line2D.Double(gameWidth,gameHeight,0,gameWidth));
+		boundsArray.add(new Line2D.Double(0,gameWidth,0,0));
 		setBackground(Color.BLACK);
 		startGame();
 	}
@@ -267,6 +272,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		drawLasers(g2);
 		drawEffects(g2);
 		drawEntities(g2);
+		drawBounds(g2);
 		g.setColor(Color.white);
 		g.drawString(particleArray.size()+"", panelWidth / 2, panelHeight / 2);
 		g2.setColor(Color.BLACK);
@@ -295,6 +301,16 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			p1 = adjustToCamera(p1);
 			p2 = adjustToCamera(p2);
 			g2.draw(new Line2D.Double(p1,p2));
+		}
+	}
+	public void drawBounds(Graphics2D g2){
+		for(Line2D line : boundsArray){
+			g2.setColor(Color.BLUE);
+			Point2D p1 = line.getP1();
+			Point2D p2 = line.getP2();
+			p1 = adjustToCamera(p1);
+			p2 = adjustToCamera(p2);
+			g2.draw(new Line2D.Double(p1, p2));
 		}
 	}
 	public Point2D adjustToCamera(double x, double y){
