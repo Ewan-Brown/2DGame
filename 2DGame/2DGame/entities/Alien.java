@@ -10,8 +10,9 @@ import main.GameMath;
 
 public class Alien extends EntityAI {
 	double angle;
+	//XXX Temp value
 	int COOLDOWN = 50;
-	int cooldownTimer = 250;
+	int cooldownTimer = 200000;
 	final double SHOTGUN_CHOKE = 0.08;
 	double shotAccuracy = 0.1;
 
@@ -19,7 +20,8 @@ public class Alien extends EntityAI {
 		super(x, y,Color.RED);
 		this.width = 10;
 		this.height = 10;
-		this.speed = 1;
+		//XXX temp value
+		this.speed = 0.01;
 	}
 	public void updateTarget(ArrayList<Entity> friendlyArray) {
 		double dist;

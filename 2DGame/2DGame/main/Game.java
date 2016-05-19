@@ -43,13 +43,14 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	private static final long serialVersionUID = 1L;
 	public final DecimalFormat df = new DecimalFormat("#.##");
 	//config settings
+	final boolean cameraFollowPlayer = true;
 	int slideSpeed = 2;
 	int wallShrinkCount = 10;
 	int WALL_SHRINK_MAX = 3;
 	Player player;
-	public double safeSpawnDistance = 200;
-	int aliens = 0;
-	int walls = 15;
+	public double safeSpawnDistance = 400;
+	int aliens = 1;
+	int walls = 0;
 	//used to keep from spawning things outside of frame!
 	int panelWidth;
 	int panelHeight;
@@ -102,8 +103,9 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		mineArray.clear();
 		powerupArray.clear();
 		breederArray.clear();
+		missileArray.clear();
 		//XXX Temporary testing Missile
-		missileArray.add(new Missile(300,300));
+//		missileArray.add(new Missile(300,300));
 		//TODO Should player be RESPAWNED, or RECREATED?
 		player.respawn(panelWidth / 2, panelHeight / 2);
 		
@@ -278,8 +280,22 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void drawLasers(Graphics2D g2){
 		for(Laser laser : laserArray){
 			g2.setColor(laser.color);
-			g2.draw(laser.getLine());
+			Point2D p1 = laser.getLine().getP1();
+			Point2D p2 = laser.getLine().getP2();
+			p1 = adjustToCamera(p1);
+			p2 = adjustToCamera(p2);
+			g2.draw(new Line2D.Double(p1,p2));
 		}
+	}
+	public Point2D adjustToCamera(double x, double y){
+		if(cameraFollowPlayer){
+			x = (x - player.x + panelWidth / 2);
+			y = (y - player.y + panelHeight / 2);
+		}
+		return new Point2D.Double(x, y);
+	}
+	public Point2D adjustToCamera(Point2D p){
+		return (adjustToCamera(p.getX(),p.getY()));
 	}
 	//Takes a 'laser' after a click from the player, crops it appropiately if it is intersecting a wall, and then makes it much longer so
 	//that it appears to be infinitely long.
@@ -344,7 +360,13 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		for(int i = 0; i < particleArray.size(); i++){
 			cParticle = particleArray.get(i);
 			g.setColor(cParticle.color);
-			g.fillRect((int)cParticle.x, (int)cParticle.y, 2, 2);
+			int x = (int) cParticle.x;
+			int y = (int) cParticle.y;
+			if(cameraFollowPlayer){
+				x = (int) (x - player.x + panelWidth / 2);
+				y = (int) (y - player.y + panelHeight / 2);
+			}
+			g.fillRect((int)x, (int)y, 2, 2);
 		}
 	}
 	//Main entity-drawing method.
@@ -355,7 +377,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		tempArray.addAll(targetArray);
 		tempArray.addAll(breederArray);
 		for(Entity e : tempArray){
-			drawHealthBar(g2,e);
+//			drawHealthBar(g2,e);
 		}
 		tempArray.addAll(mineArray);
 		tempArray.addAll(bulletArray);
@@ -373,7 +395,10 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	}
 	public void drawEntity(Graphics g,Entity e){
 		g.setColor(e.color);
-		g.fillRect((int)e.x - ((e.width - 1) / 2), (int)e.y - ((e.height - 1) / 2), 	e.width, e.height);
+		int x = (int) e.x;
+		int y = (int) e.y;
+		Point2D p = adjustToCamera(x,y);
+		g.fillRect((int)p.getX() - ((e.width - 1) / 2), (int)p.getY() - ((e.height - 1) / 2), 	e.width, e.height);
 	}
 	//Draws a health bar below entities
 	public void drawHealthBar(Graphics g, Entity e){
@@ -382,7 +407,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		int barWidth = 35;
 		double x = e.x - (barWidth * (health / e.maxHealth)) / 2;
 		double y = e.getBottomSide() + 5;
-		g.fillRect((int)x, (int)y,(int) (barWidth * (health / e.maxHealth)), 3);
+		Point2D p = adjustToCamera(x,y);
+		g.fillRect((int)p.getX(), (int)p.getY(),(int) (barWidth * (health / e.maxHealth)), 3);
 	}
 	public void updateMines(){
 		for(int i = 0; i < mineArray.size(); i++){
@@ -673,7 +699,17 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void mouseClicked(MouseEvent e) {}
 	@Override
 	public void mousePressed(MouseEvent e) {
-		player.click(new Point(e.getX(),e.getY()),e.getButton());
+		Point2D p = e.getPoint();
+		double x = p.getX();
+		double y = p.getY();
+		System.out.println(x + " " + y);
+		if(cameraFollowPlayer){
+			x = (p.getX() + (player.x - panelWidth / 2));
+			y = (p.getY() + (player.y - panelHeight / 2));
+		}
+		System.out.println(x + " " + y);
+		System.out.println(" ");
+		player.click(new Point2D.Double(x,y),e.getButton());
 	}
 	@Override
 	public void mouseReleased(MouseEvent e) {}

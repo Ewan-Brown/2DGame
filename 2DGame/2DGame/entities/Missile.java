@@ -53,9 +53,6 @@ public class Missile extends EntityAI{
 		targetAngle = Math.atan2(target.y - y, target.x - x);
 		double diff = dirAngle - targetAngle;
 		diff = (diff + 3 * Math.PI) %(2 * Math.PI) - Math.PI;
-		if(diff > Math.PI){
-			System.out.println(diff);
-		}
 		dirAngle -= diff / 20;
 		deltaX = speed * Math.cos(dirAngle);
 		deltaY = speed * Math.sin(dirAngle);

@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Random;
@@ -20,14 +21,14 @@ public class Player extends Entity{
 	public boolean sprint;
 	public ControlSet controls;
 	int swordLength = 100;
-	public Point lastLaser;
-	public Point lastShot;
-	public Point lastMine;
+	public Point2D lastLaser;
+	public Point2D lastShot;
+	public Point2D lastMine;
 	public Entity target;
-	int MAX_AMMUNITION = 100;
-	int ammunition = 100;
+	int MAX_AMMUNITION = 100000;
+	int ammunition = 100000;
 	int MAX_MINES = 3;
-	int mines = 3;
+	int mines = 5;
 	int laserTimerMax = 10;
 	int laserTimer;
 	int mineTimerMax = 40;
@@ -98,7 +99,7 @@ public class Player extends Entity{
 		}
 		return new Line2D.Double(p.x, p.y, x, y);
 	}
-	public void click(Point click,int e){
+	public void click(Point2D click,int e){
 		if(e == MouseEvent.BUTTON1){
 			lastShot = click;
 		}
@@ -117,7 +118,7 @@ public class Player extends Entity{
 			}
 			ammunition--;
 			double speedX = 0,speedY = 0,angle = 0;
-			angle = Math.atan2(lastShot.y - y, lastShot.x - x);
+			angle = Math.atan2(lastShot.getY() - y, lastShot.getX() - x);
 			angle += (rand.nextDouble() - 0.5) * 0.3;
 			speedX = 2.0 * Math.cos(angle);
 			speedY = 2.0 * Math.sin(angle);
