@@ -44,7 +44,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	private static final long serialVersionUID = 1L;
 	public final DecimalFormat df = new DecimalFormat("#.##");
 	//config settings
-	final boolean cameraFollowPlayer = true;
+	final boolean cameraFollowPlayer = false;
 	int slideSpeed = 2;
 	int wallShrinkCount = 10;
 	int WALL_SHRINK_MAX = 3;
@@ -141,7 +141,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		//Spawns requested amount of aliens
 		for(int i = 0; i < aliens; i++){
 			spawnAlien();
-			//			spawnTarget();
+			//spawnTarget();
 		}
 	}
 	//Method to spawn a wall, with random dimensions(with limits) in a random location
@@ -198,7 +198,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		for(Entity e : tempArray){
 			if(e.getRightSide() < 0){
 				//TODO Why call this method? doesn't make sense
-				e.onEntityCollision();
+				e.dead = true;
+				e.onDeath();
 			}
 		}		
 	}
@@ -228,6 +229,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	//'TICK' of the game. Called continually by the 'main loop'.
 	//Updates all Entities and then calls a repaint on the game window.
 	public void update(){
+		slide();
 		updateEffects();
 		player.updateControls(keySet);
 		addBullets(player.shoot());
@@ -698,7 +700,6 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		tempArray.addAll(alienArray);
 		tempArray.addAll(mineArray);
 		tempArray.addAll(bulletArray);
-		tempArray.addAll(missileArray);
 		tempArray.addAll(breederArray);
 		for(Entity cEntity : tempArray){
 			if(cEntity.dead == false){

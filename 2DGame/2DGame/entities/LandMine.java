@@ -7,7 +7,7 @@ import java.util.Random;
 public class LandMine extends Entity{
 	
 	int timer = 300;
-	int bullets = 200;
+	int bullets = 2000;
 
 	public LandMine(double x, double y) {
 		super(x, y,Color.MAGENTA);

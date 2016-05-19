@@ -10,7 +10,6 @@ import main.GameMath;
 
 public class Alien extends EntityAI {
 	double angle;
-	//XXX Temp value
 	int COOLDOWN = 50;
 	int cooldownTimer = 200000;
 	final double SHOTGUN_CHOKE = 0.08;
@@ -20,8 +19,7 @@ public class Alien extends EntityAI {
 		super(x, y,Color.RED);
 		this.width = 10;
 		this.height = 10;
-		//XXX temp value
-		this.speed = 0.01;
+		this.speed = 1;
 	}
 	public void updateTarget(ArrayList<Entity> friendlyArray) {
 		double dist;
@@ -73,8 +71,6 @@ public class Alien extends EntityAI {
 		}
 		return bArray;
 	}
-	//TODO laser shoot!
-	//TODO smart shooting?
 	public ArrayList<? extends Particle> onDeath(){
 		Color c = color;
 		this.deadColor();
