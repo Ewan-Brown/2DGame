@@ -34,14 +34,7 @@ public class ParticleSwirly extends Particle{
 		this.baseSpeedY -=baseSpeedY / 100;
 		if(Math.abs(baseSpeedX) < 0.2 && Math.abs(baseSpeedY) < 0.2){
 			this.dead = true;
-		}
-		if(this.x > main.Main.w || this.x < 0){
-			this.dead = true;
-		}
-		if(this.y > main.Main.h || this.y < 0){
-			this.dead = true;
-		}
-		
+		}		
 		x += speedX + baseSpeedX;
 		y += speedY + baseSpeedY;
 		

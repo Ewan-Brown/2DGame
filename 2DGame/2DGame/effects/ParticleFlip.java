@@ -19,12 +19,6 @@ public class ParticleFlip extends ParticleImplode{
 		this.speedY -= antiY + speedX / 100;	
 		this.x += speedX;
 		this.y += speedY;
-		if(this.x > main.Main.w || this.x < 0){
-			this.dead = true;
-		}
-		if(this.y > main.Main.h || this.y < 0){
-			this.dead = true;
-		}
 	}
 
 }

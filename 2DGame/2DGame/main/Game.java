@@ -22,6 +22,7 @@ import javax.swing.JPanel;
 
 import effects.Effects;
 import effects.Particle;
+import effects.ParticleBasic;
 import entities.Alien;
 import entities.Breeder;
 import entities.Bullet;
@@ -49,11 +50,13 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	int WALL_SHRINK_MAX = 3;
 	Player player;
 	public double safeSpawnDistance = 400;
-	int aliens = 1;
-	int walls = 0;
+	int aliens = 2;
+	int walls = 20;
 	//used to keep from spawning things outside of frame!
 	int panelWidth;
 	int panelHeight;
+	int gameWidth;
+	int gameHeight;
 	/* A set of bits, each bit representing a possible character from the keyboard. When one is detected to be pressed,
 	 * that key is flipped ON, and if that key is released, the equivilant bit is flipped OFF.
 	 * The number-key reference used is from the KeyEvent class.
@@ -86,7 +89,9 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		addMouseListener(this);
 		panelWidth = w;
 		panelHeight = h;
-		player = new Player(panelWidth / 2, panelHeight / 2,Color.GREEN,controls[0]);
+		gameWidth = panelWidth * 2;
+		gameHeight = panelHeight * 2;
+		player = new Player(gameWidth / 2, gameHeight / 2,Color.GREEN,controls[0]);
 		setBackground(Color.BLACK);
 		startGame();
 	}
@@ -107,7 +112,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		//XXX Temporary testing Missile
 //		missileArray.add(new Missile(300,300));
 		//TODO Should player be RESPAWNED, or RECREATED?
-		player.respawn(panelWidth / 2, panelHeight / 2);
+		player.respawn(gameWidth / 2, gameHeight / 2);
 		
 		//Spawning the requested amount of Aliens and Walls
 		for(int i = 0; i < aliens; i++){
@@ -137,25 +142,25 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	//Method to spawn a wall, with random dimensions(with limits) in a random location
 	public void spawnWall(){
 		//Added the '+10' for the dimensions so that the walls would not be too small, allowing entites to pass through objects
-		wallArray.add(new Wall(rand.nextInt(panelWidth),rand.nextInt(panelHeight),rand.nextInt(100) + 10,rand.nextInt(100) + 10));
+		wallArray.add(new Wall(rand.nextInt(gameWidth),rand.nextInt(gameHeight),rand.nextInt(100) + 10,rand.nextInt(100) + 10));
 
 	}
 	//Method to spawn a mine, in a random location
 	public void spawnMine(){
-		mineArray.add(new LandMine(rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
+		mineArray.add(new LandMine(rand.nextInt(gameWidth),rand.nextInt(gameHeight)));
 	}
 	//Method to spawn an alien, in a random location but atleast a certain distance from the player.
 	public void spawnAlien(){
 		Alien cAlien;
 		//XXX hack-loop respawns alien continually in random locations until a 'safe' spot is chosen.
 		do{
-			cAlien = new Alien(rand.nextInt(panelWidth),rand.nextInt(panelHeight));
+			cAlien = new Alien(rand.nextInt(gameWidth),rand.nextInt(gameHeight));
 		}while(GameMath.getDistance(cAlien, player) < safeSpawnDistance);
 		alienArray.add(cAlien);
 	}
 	//Method to spawn a target in a random location
 	public void spawnTarget(){
-		targetArray.add(new Target(rand.nextInt(panelWidth),rand.nextInt(panelHeight)));
+		targetArray.add(new Target(rand.nextInt(gameWidth),rand.nextInt(gameHeight)));
 	}
 	//Slides all the stationary objects(Walls/powerups) 1 unit to the left,
 	//Removes these if they exit the left side of the game.
@@ -242,12 +247,17 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	}
 	//Updates particle logic
 	public void updateEffects(){
+		Particle cParticle;
 		for(int i = 0; i < particleArray.size();i++){
-			if(particleArray.get(i).dead){
+			cParticle = particleArray.get(i);
+			if(cParticle.x < 0 || cParticle.x > gameWidth || cParticle.y < 0 || cParticle.y > gameHeight){
+				cParticle.dead = true;
+			}
+			if(cParticle.dead){
 				particleArray.remove(i);
 			}
 			else{
-				particleArray.get(i).update();
+				cParticle.update();
 			}
 		}
 	}
@@ -357,16 +367,14 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	}
 	public void drawEffects(Graphics g){
 		Particle cParticle;
+		Point2D p;
 		for(int i = 0; i < particleArray.size(); i++){
 			cParticle = particleArray.get(i);
 			g.setColor(cParticle.color);
 			int x = (int) cParticle.x;
 			int y = (int) cParticle.y;
-			if(cameraFollowPlayer){
-				x = (int) (x - player.x + panelWidth / 2);
-				y = (int) (y - player.y + panelHeight / 2);
-			}
-			g.fillRect((int)x, (int)y, 2, 2);
+			p = adjustToCamera(x,y);
+			g.fillRect((int)p.getX(), (int)p.getY(), 2, 2);
 		}
 	}
 	//Main entity-drawing method.
@@ -377,7 +385,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		tempArray.addAll(targetArray);
 		tempArray.addAll(breederArray);
 		for(Entity e : tempArray){
-//			drawHealthBar(g2,e);
+			drawHealthBar(g2,e);
 		}
 		tempArray.addAll(mineArray);
 		tempArray.addAll(bulletArray);
@@ -612,17 +620,17 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 					e.onWallCollide();
 					e.x = (e.width - 1) / 2;
 				}
-				if(r > panelWidth){
+				if(r > gameWidth){
 					e.onWallCollide();
-					e.x = panelWidth - (e.width - 1) / 2;
+					e.x = gameWidth - (e.width - 1) / 2;
 				}
 				if(u < 0){
 					e.onWallCollide();
 					e.y = (e.height - 1) / 2;
 				}
-				if(d > panelHeight){
+				if(d > gameHeight){
 					e.onWallCollide();
-					e.y = panelWidth - (e.height - 1) / 2;
+					e.y = gameWidth - (e.height - 1) / 2;
 				}
 				for(Wall w : wallArray){
 					if(GameMath.doCollide(e, w)){
@@ -702,13 +710,10 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		Point2D p = e.getPoint();
 		double x = p.getX();
 		double y = p.getY();
-		System.out.println(x + " " + y);
 		if(cameraFollowPlayer){
 			x = (p.getX() + (player.x - panelWidth / 2));
 			y = (p.getY() + (player.y - panelHeight / 2));
 		}
-		System.out.println(x + " " + y);
-		System.out.println(" ");
 		player.click(new Point2D.Double(x,y),e.getButton());
 	}
 	@Override

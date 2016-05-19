@@ -24,13 +24,6 @@ public class ParticleBasic extends Particle{
 		this.y += speedY;
 		this.speedX -= speedX / 100;
 		this.speedY -= speedY / 100;
-		//TODO MOVE CHECK-DEAD STUFF TO MAKE IT OOP-ABLE
-		if(this.x > main.Main.w || this.x < 0){
-			this.dead = true;
-		}
-		if(this.y > main.Main.h || this.y < 0){
-			this.dead = true;
-		}
 	}
 	
 

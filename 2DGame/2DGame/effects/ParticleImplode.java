@@ -24,12 +24,6 @@ public class ParticleImplode extends Particle{
 		this.speedY -= antiY;	
 		this.x += speedX;
 		this.y += speedY;
-		if(this.x > main.Main.w || this.x < 0){
-			this.dead = true;
-		}
-		if(this.y > main.Main.h || this.y < 0){
-			this.dead = true;
-		}
 	}
 
 }

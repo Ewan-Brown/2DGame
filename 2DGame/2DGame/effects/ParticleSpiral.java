@@ -24,13 +24,6 @@ public class ParticleSpiral extends Particle{
 		speedY += deltaY;
 		this.x += speedX;
 		this.y += speedY;
-		//TODO MOVE CHECK-DEAD STUFF TO MAKE IT OOP-ABLE
-		if(this.x > main.Main.w || this.x < 0){
-			this.dead = true;
-		}
-		if(this.y > main.Main.h || this.y < 0){
-			this.dead = true;
-		}
 	}
 
 }
