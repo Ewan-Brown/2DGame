@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
+//import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -50,7 +50,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	int WALL_SHRINK_MAX = 3;
 	Player player;
 	public double safeSpawnDistance = 400;
-	int aliens = 2;
+	int aliens = 3;
 	int walls = 20;
 	//used to keep from spawning things outside of frame!
 	int panelWidth;
@@ -77,21 +77,30 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public ArrayList<Laser> laserArray = new ArrayList<Laser>();
 	public ArrayList<Missile> missileArray = new ArrayList<Missile>();
 	//A Random instantiation used for spawning and other random things.
-	//TODO should this be a method wide variable, seeing as global use has no benefit?
+	//XXX should this be a method wide variable, as global use has no benefit?
 	Random rand;
 	//The constructor, for initializing the JPanel settings and fitting it in frame
-	public Game(int w, int h,ControlSet controls[]){
+	public Game(){}
+	public void init(int w, int h,ControlSet controls[]){
 		rand = new Random();
 		//XXX weird hack to keep JPanel in the JFrame
 		setPreferredSize(new Dimension(w,h));
-		///
 		setFocusable(true);
 		addKeyListener(this);
 		addMouseListener(this);
+		if(w > 1920){
+			System.out.println("Woops panel width is " + w);
+			w = 1920;
+		}
 		panelWidth = w;
+		
+		if(h > 1080){
+			System.out.println("Woops panel Height is " + h);
+			h = 1080;
+		}
 		panelHeight = h;
-		gameWidth = panelWidth + 100;
-		gameHeight = panelHeight + 100;
+		gameWidth = panelWidth;
+		gameHeight = panelHeight;
 		player = new Player(gameWidth / 2, gameHeight / 2,Color.GREEN,controls[0]);
 		boundsArray.add(new Line2D.Double(0,0,gameWidth,0));
 		boundsArray.add(new Line2D.Double(gameWidth,0,gameWidth, gameHeight));
@@ -115,10 +124,10 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		breederArray.clear();
 		missileArray.clear();
 		//XXX Temporary testing Missile
-//		missileArray.add(new Missile(300,300));
+		//		missileArray.add(new Missile(300,300));
 		//TODO Should player be RESPAWNED, or RECREATED?
 		player.respawn(gameWidth / 2, gameHeight / 2);
-		
+
 		//Spawning the requested amount of Aliens and Walls
 		for(int i = 0; i < aliens; i++){
 			spawnAlien();
@@ -126,6 +135,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		for(int i = 0; i < walls; i++){
 			spawnWall();
 		}
+		breederArray.add(new Breeder(300,300));
 		//This does not CREATE player, but instead places the player in an array that can be accessed by AI-Targetting or other such things
 		playerArray.add(player);
 	}
@@ -229,7 +239,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	//'TICK' of the game. Called continually by the 'main loop'.
 	//Updates all Entities and then calls a repaint on the game window.
 	public void update(){
-		slide();
+//		slide();
+//		shrinkWalls();
 		updateEffects();
 		player.updateControls(keySet);
 		addBullets(player.shoot());
@@ -521,24 +532,26 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	}
 	public void checkCollisions(){
 		ArrayList<Entity> tempArray = new ArrayList<Entity>();
+		ArrayList<Entity> enemyArray = new ArrayList<Entity>();
+		enemyArray.addAll(alienArray);
+		enemyArray.addAll(breederArray);
 		tempArray.addAll(playerArray);
 		tempArray.addAll(targetArray);
-		for(Alien cAlien : alienArray){
-			if(!cAlien.dead){
+		for(Entity cEnemy : enemyArray){
+			if(!cEnemy.dead){
 				for(Entity cEntity : tempArray){
 					if(!cEntity.dead){
-						if(GameMath.doCollide(cEntity, cAlien)){
-							cEntity = cAlien.attackEntity(cEntity);
+						if(GameMath.doCollide(cEntity, cEnemy)){
+							cEntity = cEnemy.attackEntity(cEntity);
 							if(cEntity.dead){
 								particleArray.addAll(cEntity.onDeath());
 							}
 						}
 					}
-
 				}
 			}
 		}
-		tempArray.addAll(alienArray);
+		tempArray.addAll(enemyArray);
 		for(Bullet cBullet : bulletArray){
 			if(!cBullet.dead){
 				for(Entity cEntity : tempArray){
@@ -565,7 +578,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			}
 		}
 		tempArray.clear();
-		tempArray.addAll(alienArray);
+		tempArray.addAll(enemyArray);
 		tempArray.addAll(bulletArray);
 		Rectangle tempRectangle;
 		Line2D swordLine = player.getSwordLine();
@@ -600,6 +613,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			Line2D line = cLaser.getLine();
 			ArrayList<Entity> tempArray = new ArrayList<Entity>();
 			tempArray.addAll(alienArray);
+			tempArray.addAll(breederArray);
 			tempArray.addAll(bulletArray);
 			tempArray.addAll(mineArray);
 			tempArray.addAll(targetArray);
@@ -701,6 +715,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		tempArray.addAll(mineArray);
 		tempArray.addAll(bulletArray);
 		tempArray.addAll(breederArray);
+		tempArray.addAll(missileArray);
 		for(Entity cEntity : tempArray){
 			if(cEntity.dead == false){
 				return false;

@@ -3,6 +3,8 @@
 import java.awt.Color;
 import java.util.ArrayList;
 
+import effects.Effects;
+import effects.Particle;
 import main.GameMath;
 
 public class Breeder extends EntityAI{
@@ -68,6 +70,11 @@ public class Breeder extends EntityAI{
 		}
 		this.x -= deltaX;
 		this.y -= deltaY;
+	}
+	public ArrayList<? extends Particle> onDeath(){
+		Color c = color;
+		this.deadColor();
+		return Effects.swirlyParticle(x, y,c);
 	}
 
 }

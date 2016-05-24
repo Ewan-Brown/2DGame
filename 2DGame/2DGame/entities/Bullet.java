@@ -12,7 +12,7 @@ public class Bullet extends EntityAI{
 	double deltaX;
 	double deltaY;
 	Entity owner;
-	boolean pierce = true;
+	boolean pierce = false;
 	public Bullet(double x, double y, double dX, double dY, Entity e) {
 		super(x, y,Color.PINK);
 		owner = e;

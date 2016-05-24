@@ -11,7 +11,7 @@ import main.GameMath;
 public class Alien extends EntityAI {
 	double angle;
 	int COOLDOWN = 50;
-	int cooldownTimer = 200000;
+	int cooldownTimer = 200;
 	final double SHOTGUN_CHOKE = 0.08;
 	double shotAccuracy = 0.1;
 
