@@ -4,31 +4,32 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.KeyStroke;
 
+import effects.Effects;
 import settings.ControlSet;
 
 public class Main{
 	static Game panel;
 	static JFrame frame;
 	static Settings settings;
-	public static int w = 1000;
-	public static int h = 1000;
+	public static int w = 2000;
+	public static int h = 2000;
 	int speed = 1;
 	Dimension preferredSize;
 	static Main main;
 	static ControlSet[] controls = new ControlSet[2];
 	public static void main(String[] args){
-		
 		try {
 			updateControls();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		start();	
+		start();
 	}
 	public static void updateControls() throws IOException{
 		List<String> text = TextFileReader.readFile("Controls.text");

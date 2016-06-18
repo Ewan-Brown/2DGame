@@ -114,4 +114,10 @@ public class Entity {
 	public double getBottomSide(){
 		return(this.y +(this.height - 1) / 2);
 	}
+	public int getCornerX(){
+		return (int) (this.x - ((this.width - 1) / 2));
+	}
+	public int getCornerY(){
+		return (int) (this.y - ((this.height - 1) / 2));
+	}
 }

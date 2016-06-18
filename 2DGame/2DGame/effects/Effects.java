@@ -66,7 +66,7 @@ public class Effects {
 		
 	}
 	public static ArrayList<ParticleFlip> flip(double x, double y, Color c){
-		int pNum = 100;
+		int pNum = 1000;
 		Random rand = new Random();
 		int speed = 20;
 		ArrayList<ParticleFlip> pArray = new ArrayList<ParticleFlip>();
@@ -94,6 +94,13 @@ public class Effects {
 		}
 		System.out.println(speedY2);
 		return pArray;
+	}
+	public static ArrayList<byte[]> setName(ArrayList<String> l){
+		ArrayList<byte[]> l2 = new ArrayList<byte[]>();
+		for(int i = 0; i < l.size(); i++){
+			l2.add(l.get(i).getBytes());
+		}
+		return l2;
 	}
 	/*TODO
 	 * Implode - WIP

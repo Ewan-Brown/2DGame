@@ -12,7 +12,7 @@ public class Missile extends EntityAI{
 
 	int MAX_EXPLODE_TIMER = 700;
 	int explodeTimer = MAX_EXPLODE_TIMER;
-	int bullets = 5000;
+	int bullets = 50000;
 	double dirAngle;
 	public Missile(double x, double y) {
 		super(x, y, Color.RED);

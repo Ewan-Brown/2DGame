@@ -44,12 +44,12 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	private static final long serialVersionUID = 1L;
 	public final DecimalFormat df = new DecimalFormat("#.##");
 	//config settings
-	final boolean cameraFollowPlayer = false;
+	final boolean cameraFollowPlayer = true;
 	int slideSpeed = 2;
 	int wallShrinkCount = 10;
 	int WALL_SHRINK_MAX = 3;
 	Player player;
-	public double safeSpawnDistance = 400;
+	public double safeSpawnDistance = 0;
 	int aliens = 3;
 	int walls = 20;
 	//used to keep from spawning things outside of frame!
@@ -57,6 +57,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	int panelHeight;
 	int gameWidth;
 	int gameHeight;
+	boolean mapOn = false;
 	/* A set of bits, each bit representing a possible character from the keyboard. When one is detected to be pressed,
 	 * that key is flipped ON, and if that key is released, the equivilant bit is flipped OFF.
 	 * The number-key reference used is from the KeyEvent class.
@@ -88,6 +89,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		setFocusable(true);
 		addKeyListener(this);
 		addMouseListener(this);
+		gameWidth = w;
+		gameHeight = h;
 		if(w > 1920){
 			System.out.println("Woops panel width is " + w);
 			w = 1920;
@@ -99,13 +102,11 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			h = 1080;
 		}
 		panelHeight = h;
-		gameWidth = panelWidth;
-		gameHeight = panelHeight;
 		player = new Player(gameWidth / 2, gameHeight / 2,Color.GREEN,controls[0]);
 		boundsArray.add(new Line2D.Double(0,0,gameWidth,0));
 		boundsArray.add(new Line2D.Double(gameWidth,0,gameWidth, gameHeight));
-		boundsArray.add(new Line2D.Double(gameWidth,gameHeight,0,gameWidth));
-		boundsArray.add(new Line2D.Double(0,gameWidth,0,0));
+		boundsArray.add(new Line2D.Double(gameWidth,gameHeight,0,gameHeight));
+		boundsArray.add(new Line2D.Double(0,gameHeight,0,0));
 		setBackground(Color.BLACK);
 		startGame();
 	}
@@ -124,7 +125,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		breederArray.clear();
 		missileArray.clear();
 		//XXX Temporary testing Missile
-		//		missileArray.add(new Missile(300,300));
+//		missileArray.add(new Missile(300,300));
 		//TODO Should player be RESPAWNED, or RECREATED?
 		player.respawn(gameWidth / 2, gameHeight / 2);
 
@@ -135,7 +136,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		for(int i = 0; i < walls; i++){
 			spawnWall();
 		}
-		breederArray.add(new Breeder(300,300));
+//		breederArray.add(new Breeder(300,300));
 		//This does not CREATE player, but instead places the player in an array that can be accessed by AI-Targetting or other such things
 		playerArray.add(player);
 	}
@@ -241,6 +242,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void update(){
 //		slide();
 //		shrinkWalls();
+		updateGlobalKeys();
 		updateEffects();
 		player.updateControls(keySet);
 		addBullets(player.shoot());
@@ -282,12 +284,17 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D) g;
+
+		if(mapOn){
+			drawMap(g2);
+			return;
+		}
 		drawLasers(g2);
 		drawEffects(g2);
 		drawEntities(g2);
 		drawBounds(g2);
 		g.setColor(Color.white);
-		g.drawString(particleArray.size()+"", panelWidth / 2, panelHeight / 2);
+		g.drawString(""+player.health,panelWidth / 2,panelHeight / 2);
 		g2.setColor(Color.BLACK);
 	}
 	//Returns the amount of enemies and hostile entities alive
@@ -306,14 +313,35 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		}
 		return a;
 	}
-	public void drawLasers(Graphics2D g2){
+	public void drawMap(Graphics2D g){
+		int mapHeight = 800;
+		int mapWidth = 800;
+		int mapX = (panelWidth / 2 - 400);
+		int mapY = (panelHeight / 2 - 400);
+		double ratio = (double)mapWidth / (double)panelWidth;
+		System.out.println(ratio);
+		g.drawRect(mapX, mapY, mapWidth, mapHeight);
+		ArrayList<Entity> entityList = new ArrayList<Entity>();
+		entityList.addAll(playerArray);
+		entityList.addAll(alienArray);
+		entityList.addAll(wallArray);
+		for(Entity e : entityList){
+			g.setColor(e.color);
+			g.drawRect((int)(e.getCornerX() * ratio + mapX), (int)(e.getCornerY() * ratio + mapY), (int)(e.width * ratio), (int)(e.height * ratio));
+		}
+		
+	}
+	public void updateGlobalKeys(){
+		mapOn = keySet.get(KeyEvent.VK_T);
+	}
+	public void drawLasers(Graphics2D g){
 		for(Laser laser : laserArray){
-			g2.setColor(laser.color);
+			g.setColor(laser.color);
 			Point2D p1 = laser.getLine().getP1();
 			Point2D p2 = laser.getLine().getP2();
 			p1 = adjustToCamera(p1);
 			p2 = adjustToCamera(p2);
-			g2.draw(new Line2D.Double(p1,p2));
+			g.draw(new Line2D.Double(p1,p2));
 		}
 	}
 	public void drawBounds(Graphics2D g2){
@@ -425,6 +453,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			drawEntity(g2,e);
 		}
 		Line2D sword = player.getSwordLine();
+		//TODO Draw sword for camera type!!! When following player, sword drawing is way off u skrub.
 		if(sword != null){
 			g2.setColor(player.color);
 			g2.draw(sword);
