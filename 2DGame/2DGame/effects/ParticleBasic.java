@@ -10,6 +10,7 @@ public class ParticleBasic extends Particle{
 	public ParticleBasic(double x, double y, double speedX, double speedY,Color c){
 		super(x,y,speedX,speedY,c);
 	}
+	@Override
 	public void update(){
 		this.life -= 1;
 		if(life < 1){

@@ -12,6 +12,7 @@ public class ParticleSpiral extends Particle{
 		this.speedX = 0;
 		this.speedY = 0;
 	}
+	@Override
 	public void update(){
 		//TODO DOESN'T WORK AT ALL
 		if(speedX > 1 || speedX < -1){

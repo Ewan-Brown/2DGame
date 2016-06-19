@@ -26,12 +26,14 @@ public class Target extends EntityAI{
 			}
 		}
 	}
+	@Override
 	public ArrayList<? extends Particle> onDeath(){
 		Color c = color;
 		this.deadColor();
 		return Effects.swirlyParticle(this.x, this.y, c);
 
 	}
+	@Override
 	public void moveAI(){
 		super.moveAI();
 		this.x -= deltaX;

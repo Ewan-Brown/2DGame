@@ -31,14 +31,17 @@ public class Bullet extends EntityAI{
 		damage = Damage;
 	}
 	
+	@Override
 	public void moveAI(){
 		this.x += deltaX;
 		this.y += deltaY;
 	}
+	@Override
 	public  ArrayList<? extends ParticleBasic> onWallCollide(){
 		this.dead = true;
 		return Effects.explode(x, y, Color.RED, 3);
 	}
+	@Override
 	public Entity attackEntity(Entity e){
 		
 		if(!pierce){
@@ -49,6 +52,7 @@ public class Bullet extends EntityAI{
 		}
 		return e;
 	}
+	@Override
 	public ArrayList<? extends Particle> onDeath(){
 		return new ArrayList<ParticleBasic>();
 	}

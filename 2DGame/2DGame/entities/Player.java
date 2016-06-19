@@ -46,6 +46,7 @@ public class Player extends Entity{
 		laserTimer = laserTimerMax;
 		mineTimer = mineTimerMax;
 	}
+	@Override
 	public void moveEntity(double x, double y){
 		if(sprint && sprintCharge > 10){
 			sprintCharge -= 5;
@@ -56,6 +57,7 @@ public class Player extends Entity{
 		}
 		super.moveEntity(x, y);
 	}
+	@Override
 	public ArrayList<? extends Particle> onDeath(){
 		Color c = color;
 		this.deadColor();
@@ -94,7 +96,7 @@ public class Player extends Entity{
 	}
 	public Line2D getSwordLine(){
 		Point p = this.getSwordPoint();
-		if((int)p.x - (int)x == 0 && (int)p.y - (int)y == 0){
+		if(p.x - (int)x == 0 && p.y - (int)y == 0){
 			return null;
 		}
 		return new Line2D.Double(p.x, p.y, x, y);

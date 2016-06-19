@@ -13,6 +13,7 @@ public class ParticleImplode extends Particle{
 		this.speedY += speedY / 5;
 		this.speedX += speedX / 5;
 	}
+	@Override
 	public void update(){
 		this.life -= 1;
 		if(life < 1){

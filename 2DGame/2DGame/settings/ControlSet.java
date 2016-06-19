@@ -4,8 +4,6 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.util.BitSet;
 
-import main.GameMath;
-
 public class ControlSet {
 	
 	int upKey,leftKey,downKey,rightKey;

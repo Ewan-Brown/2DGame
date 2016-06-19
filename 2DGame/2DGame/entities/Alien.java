@@ -2,8 +2,6 @@ package entities;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Random;
-
 import effects.Effects;
 import effects.Particle;
 import main.GameMath;
@@ -71,16 +69,19 @@ public class Alien extends EntityAI {
 		}
 		return bArray;
 	}
+	@Override
 	public ArrayList<? extends Particle> onDeath(){
 		Color c = color;
 		this.deadColor();
 		return Effects.flip(x, y,c);
 	}
+	@Override
 	public void moveAI() {
 		super.moveAI();
 		this.x += deltaX;
 		this.y += deltaY;
 	}
+	@Override
 	public void onEntityCollision(){
 		this.dead = true;
 	}

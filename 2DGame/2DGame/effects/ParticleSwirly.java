@@ -13,6 +13,7 @@ public class ParticleSwirly extends Particle{
 		baseSpeedX = speedX;
 		baseSpeedY = speedY;
 	}
+	@Override
 	public void update(){
 		b = (Math.random() < 0.5) ? true : false;
 		if(speedX != 0){

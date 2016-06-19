@@ -10,6 +10,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -22,7 +26,6 @@ import javax.swing.JPanel;
 
 import effects.Effects;
 import effects.Particle;
-import effects.ParticleBasic;
 import entities.Alien;
 import entities.Breeder;
 import entities.Bullet;
@@ -44,14 +47,17 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	private static final long serialVersionUID = 1L;
 	public final DecimalFormat df = new DecimalFormat("#.##");
 	//config settings
-	final boolean cameraFollowPlayer = true;
+	public boolean cameraFollowPlayer = true;
 	int slideSpeed = 2;
 	int wallShrinkCount = 10;
 	int WALL_SHRINK_MAX = 3;
 	Player player;
 	public double safeSpawnDistance = 0;
-	int aliens = 3;
-	int walls = 20;
+	public int aliens = 3;
+	public int missiles = 0;
+	public int breeders = 0;
+	public int walls = 20;
+	public int targets = 1;
 	//used to keep from spawning things outside of frame!
 	int panelWidth;
 	int panelHeight;
@@ -83,32 +89,33 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	//The constructor, for initializing the JPanel settings and fitting it in frame
 	public Game(){}
 	public void init(int w, int h,ControlSet controls[]){
+		boundsArray.clear();
 		rand = new Random();
 		//XXX weird hack to keep JPanel in the JFrame
-		setPreferredSize(new Dimension(w,h));
 		setFocusable(true);
 		addKeyListener(this);
 		addMouseListener(this);
 		gameWidth = w;
 		gameHeight = h;
 		if(w > 1920){
-			System.out.println("Woops panel width is " + w);
+			System.out.println("Woops panel width is " + w + "; panel width set to 1920");
 			w = 1920;
 		}
-		panelWidth = w;
 		
 		if(h > 1080){
-			System.out.println("Woops panel Height is " + h);
+			System.out.println("Woops panel height is " + h + "; panel height set to 1080");
 			h = 1080;
 		}
+		panelWidth = w;
 		panelHeight = h;
+		setPreferredSize(new Dimension(w,h));
 		player = new Player(gameWidth / 2, gameHeight / 2,Color.GREEN,controls[0]);
 		boundsArray.add(new Line2D.Double(0,0,gameWidth,0));
 		boundsArray.add(new Line2D.Double(gameWidth,0,gameWidth, gameHeight));
 		boundsArray.add(new Line2D.Double(gameWidth,gameHeight,0,gameHeight));
 		boundsArray.add(new Line2D.Double(0,gameHeight,0,0));
 		setBackground(Color.BLACK);
-		startGame();
+//		startGame();
 	}
 	//Called when game first starts, and every time a 'game-over' occurs(when player dies)
 	//Clears all entities then spawns in new ones
@@ -136,7 +143,15 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		for(int i = 0; i < walls; i++){
 			spawnWall();
 		}
-//		breederArray.add(new Breeder(300,300));
+		for(int i = 0; i < breeders; i++){
+			spawnBreeder();
+		}
+		for(int i = 0; i < missiles; i++){
+			spawnMissile();
+		}
+		for(int i = 0; i < targets; i++){
+			spawnTarget();
+		}
 		//This does not CREATE player, but instead places the player in an array that can be accessed by AI-Targetting or other such things
 		playerArray.add(player);
 	}
@@ -152,7 +167,6 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		//Spawns requested amount of aliens
 		for(int i = 0; i < aliens; i++){
 			spawnAlien();
-			//spawnTarget();
 		}
 	}
 	//Method to spawn a wall, with random dimensions(with limits) in a random location
@@ -168,11 +182,24 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	//Method to spawn an alien, in a random location but atleast a certain distance from the player.
 	public void spawnAlien(){
 		Alien cAlien;
-		//XXX hack-loop respawns alien continually in random locations until a 'safe' spot is chosen.
 		do{
 			cAlien = new Alien(rand.nextInt(gameWidth),rand.nextInt(gameHeight));
 		}while(GameMath.getDistance(cAlien, player) < safeSpawnDistance);
 		alienArray.add(cAlien);
+	}
+	public void spawnBreeder(){
+		Breeder cBreeder;
+		do{
+			cBreeder = new Breeder(rand.nextInt(gameWidth),rand.nextInt(gameHeight));
+		}while(GameMath.getDistance(cBreeder, player) < safeSpawnDistance);
+		breederArray.add(cBreeder);
+	}
+	public void spawnMissile(){
+		Missile cMissile;
+		do{
+			cMissile = new Missile(rand.nextInt(gameWidth),rand.nextInt(gameHeight));
+		}while(GameMath.getDistance(cMissile, player) < safeSpawnDistance);
+		missileArray.add(cMissile);
 	}
 	//Method to spawn a target in a random location
 	public void spawnTarget(){
@@ -281,6 +308,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			}
 		}
 	}
+	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D) g;
@@ -314,20 +342,44 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		return a;
 	}
 	public void drawMap(Graphics2D g){
-		int mapHeight = 800;
-		int mapWidth = 800;
-		int mapX = (panelWidth / 2 - 400);
-		int mapY = (panelHeight / 2 - 400);
-		double ratio = (double)mapWidth / (double)panelWidth;
-		System.out.println(ratio);
+		g.setColor(Color.BLUE);
+		int maxDimension = 800;
+		int mapHeight = 0;
+		int mapWidth = 0;
+		double sizeRatio = 1;
+		double ratioW;
+		double ratioH;
+		if(gameWidth > gameHeight){
+			mapWidth = maxDimension;
+			double ratio = (double)gameHeight / (double)gameWidth;
+			sizeRatio = (double)maxDimension / (double)gameWidth;
+			mapHeight = (int) (ratio * mapWidth);
+		}
+		else if(gameWidth < gameHeight){
+			mapHeight = maxDimension;
+			double ratio = (double)gameWidth / (double)gameHeight;
+			sizeRatio = (double)maxDimension / (double)gameHeight;
+			mapWidth = (int)(ratio * mapHeight);
+		}
+		else{
+			mapWidth = maxDimension;
+			mapHeight = maxDimension;
+			sizeRatio = (double)maxDimension / (double)gameWidth;
+		}
+		int mapX = (panelWidth / 2 - maxDimension / 2);
+		int mapY = (panelHeight / 2 - maxDimension / 2);
+		ratioW = (double)mapWidth / (double)gameWidth;
+		ratioH = (double)mapHeight / (double)gameHeight;
 		g.drawRect(mapX, mapY, mapWidth, mapHeight);
 		ArrayList<Entity> entityList = new ArrayList<Entity>();
 		entityList.addAll(playerArray);
 		entityList.addAll(alienArray);
 		entityList.addAll(wallArray);
+		entityList.addAll(missileArray);
+		entityList.addAll(targetArray);
 		for(Entity e : entityList){
 			g.setColor(e.color);
-			g.drawRect((int)(e.getCornerX() * ratio + mapX), (int)(e.getCornerY() * ratio + mapY), (int)(e.width * ratio), (int)(e.height * ratio));
+			g.drawRect((int)(e.getCornerX() * ratioW + mapX), (int)(e.getCornerY() * ratioH + mapY), (int)(e.width * sizeRatio), (int)(e.height * sizeRatio));
 		}
 		
 	}
@@ -454,9 +506,12 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		}
 		Line2D sword = player.getSwordLine();
 		//TODO Draw sword for camera type!!! When following player, sword drawing is way off u skrub.
+
 		if(sword != null){
+			Point2D p1 = adjustToCamera(sword.getP1());
+			Point2D p2 = adjustToCamera(sword.getP2());
 			g2.setColor(player.color);
-			g2.draw(sword);
+			g2.draw(new Line2D.Double(p1,p2));
 		}
 	}
 	public void drawEntity(Graphics g,Entity e){
@@ -691,7 +746,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 				}
 				if(d > gameHeight){
 					e.onWallCollide();
-					e.y = gameWidth - (e.height - 1) / 2;
+					e.y = gameHeight - (e.height - 1) / 2;
 				}
 				for(Wall w : wallArray){
 					if(GameMath.doCollide(e, w)){
@@ -755,7 +810,6 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	@Override
 	public void keyTyped(KeyEvent e) {}
 	@Override
-
 	public void keyPressed(KeyEvent e) {
 		keySet.set(e.getKeyCode());
 	}
@@ -782,6 +836,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	@Override
 	public void mouseEntered(MouseEvent e) {}
 	@Override
-	public void mouseExited(MouseEvent e) {}
+	public void mouseExited(MouseEvent e) {
+	}
 
 }

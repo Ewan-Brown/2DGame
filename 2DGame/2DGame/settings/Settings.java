@@ -1,22 +1,24 @@
-package main;
+package settings;
 
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.JFrame;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JRadioButton;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+
+import main.Game;
 
 public class Settings {
 
-	JFrame frame;
+	public JFrame frame;
+	public boolean done = false;
 	private JTextField txtPWidth;
 	private JTextField txtPHeight;
-	private JTextField txtGheight;
+	private JTextField txtGHeight;
 	private JTextField txtGWidth;
 	private JLabel lblGameDim;
 	private JTextField txtAliens;
@@ -26,12 +28,15 @@ public class Settings {
 	private JLabel lblMissiles;
 	private JTextField txtWalls;
 	private JLabel lblWalls;
+	private JTextField txtBreeders;
+	private JRadioButton followCam;
 
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					Settings window = new Settings();
@@ -53,7 +58,7 @@ public class Settings {
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	public void initialize() {
 		frame = new JFrame();
 		frame.setVisible(true);
 		frame.setBounds(100, 100, 540, 266);
@@ -63,6 +68,7 @@ public class Settings {
 		lblPanelDim.setBounds(12, 13, 140, 26);
 		
 		txtPWidth = new JTextField();
+		txtPWidth.setText("1920");
 		txtPWidth.setBounds(12, 44, 76, 22);
 		txtPWidth.setColumns(10);
 		frame.getContentPane().setLayout(null);
@@ -70,16 +76,19 @@ public class Settings {
 		frame.getContentPane().add(txtPWidth);
 		
 		txtPHeight = new JTextField();
+		txtPHeight.setText("1080");
 		txtPHeight.setColumns(10);
 		txtPHeight.setBounds(100, 44, 76, 22);
 		frame.getContentPane().add(txtPHeight);
 		
-		txtGheight = new JTextField();
-		txtGheight.setColumns(10);
-		txtGheight.setBounds(100, 110, 76, 22);
-		frame.getContentPane().add(txtGheight);
+		txtGHeight = new JTextField();
+		txtGHeight.setText("1080");
+		txtGHeight.setColumns(10);
+		txtGHeight.setBounds(100, 110, 76, 22);
+		frame.getContentPane().add(txtGHeight);
 		
 		txtGWidth = new JTextField();
+		txtGWidth.setText("1920");
 		txtGWidth.setColumns(10);
 		txtGWidth.setBounds(12, 110, 76, 22);
 		frame.getContentPane().add(txtGWidth);
@@ -88,7 +97,7 @@ public class Settings {
 		lblGameDim.setBounds(12, 79, 112, 26);
 		frame.getContentPane().add(lblGameDim);
 		
-		JRadioButton followCam = new JRadioButton("Camera Follows Player");
+		followCam = new JRadioButton("Camera Follows Player");
 		followCam.setBounds(12, 141, 164, 25);
 		frame.getContentPane().add(followCam);
 		
@@ -101,11 +110,13 @@ public class Settings {
 		frame.getContentPane().add(lblAliens);
 		
 		txtAliens = new JTextField();
+		txtAliens.setText("3");
 		txtAliens.setBounds(278, 44, 44, 22);
 		frame.getContentPane().add(txtAliens);
 		txtAliens.setColumns(10);
 		
 		txtTargets = new JTextField();
+		txtTargets.setText("1");
 		txtTargets.setColumns(10);
 		txtTargets.setBounds(278, 79, 44, 22);
 		frame.getContentPane().add(txtTargets);
@@ -115,6 +126,7 @@ public class Settings {
 		frame.getContentPane().add(lblTargets);
 		
 		txtMissiles = new JTextField();
+		txtMissiles.setText("0");
 		txtMissiles.setColumns(10);
 		txtMissiles.setBounds(278, 110, 44, 22);
 		frame.getContentPane().add(txtMissiles);
@@ -124,6 +136,7 @@ public class Settings {
 		frame.getContentPane().add(lblMissiles);
 		
 		txtWalls = new JTextField();
+		txtWalls.setText("10");
 		txtWalls.setColumns(10);
 		txtWalls.setBounds(278, 141, 44, 22);
 		frame.getContentPane().add(txtWalls);
@@ -135,5 +148,31 @@ public class Settings {
 		JButton btnEnter = new JButton("Enter");
 		btnEnter.setBounds(386, 93, 97, 25);
 		frame.getContentPane().add(btnEnter);
+		btnEnter.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e)
+		    {
+				done = true;
+		    }
+		});
+		
+		txtBreeders = new JTextField();
+		txtBreeders.setText("0");
+		txtBreeders.setColumns(10);
+		txtBreeders.setBounds(278, 173, 44, 22);
+		frame.getContentPane().add(txtBreeders);
+		
+		JLabel lblBreeders = new JLabel("Breeders");
+		lblBreeders.setBounds(210, 176, 112, 16);
+		frame.getContentPane().add(lblBreeders);
+		
+	}
+	public void setData(Game game,ControlSet[] controls){
+		game.aliens = Integer.parseInt(txtAliens.getText());
+		game.missiles = Integer.parseInt(txtMissiles.getText());
+		game.breeders = Integer.parseInt(txtBreeders.getText());
+		game.walls = Integer.parseInt(txtWalls.getText());
+		game.targets = Integer.parseInt(txtTargets.getText());
+		game.cameraFollowPlayer = followCam.isSelected();
+		game.init(Integer.parseInt(txtGWidth.getText()), Integer.parseInt(txtGHeight.getText()), controls);
 	}
 }

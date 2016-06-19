@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
 
-import effects.Effects;
 import effects.Particle;
 import main.GameMath;
 
@@ -45,10 +44,12 @@ public class Missile extends EntityAI{
 			}
 		}
 	}
+	@Override
 	public ArrayList<? extends Particle> onDeath(){
 		this.deadColor();
 		return new ArrayList<Particle>();
 	}
+	@Override
 	public void moveAI(){
 		targetAngle = Math.atan2(target.y - y, target.x - x);
 		double diff = dirAngle - targetAngle;

@@ -42,6 +42,7 @@ public class Breeder extends EntityAI{
 			return null;
 		}
 	}
+	@Override
 	public void moveAI(){
 		baseAngle += ((rand.nextDouble() - 0.5) * 2) * Math.PI * 0.07;
 		if(baseAngle > Math.PI / 2){
@@ -71,6 +72,7 @@ public class Breeder extends EntityAI{
 		this.x -= deltaX;
 		this.y -= deltaY;
 	}
+	@Override
 	public ArrayList<? extends Particle> onDeath(){
 		Color c = color;
 		this.deadColor();
