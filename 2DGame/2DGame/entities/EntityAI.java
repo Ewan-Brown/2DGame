@@ -22,5 +22,13 @@ public class EntityAI extends Entity{
 			deltaY = speed * Math.sin(targetAngle);
 		}
 	}
+	
+	public double getDirectionAngle(){
+		double angle = Math.acos((deltaX / speed));
+		if(deltaY < 0){
+			angle = -angle;
+		}
+		return angle;
+	}
 
 }

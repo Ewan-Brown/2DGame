@@ -120,4 +120,5 @@ public class Entity {
 	public int getCornerY(){
 		return (int) (this.y - ((this.height - 1) / 2));
 	}
+
 }

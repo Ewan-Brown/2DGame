@@ -6,14 +6,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 //import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -30,13 +29,15 @@ import entities.Alien;
 import entities.Breeder;
 import entities.Bullet;
 import entities.Entity;
+import entities.EntityAI;
 import entities.LandMine;
 import entities.Laser;
 import entities.Missile;
 import entities.Player;
 import entities.Target;
 import entities.Wall;
-import entities.powerups.BasicPowerup;
+import entities.powerups.PowerupBasic;
+import entities.powerups.PowerupSize;
 import settings.ControlSet;
 
 public class Game extends JPanel implements KeyListener,MouseListener{
@@ -80,7 +81,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public ArrayList<Bullet> bulletArray = new ArrayList<Bullet>();
 	public ArrayList<LandMine> mineArray = new ArrayList<LandMine>();
 	public ArrayList<Wall> wallArray = new ArrayList<Wall>();
-	public ArrayList<BasicPowerup> powerupArray = new ArrayList<BasicPowerup>();	
+	public ArrayList<PowerupBasic> powerupArray = new ArrayList<PowerupBasic>();	
 	public ArrayList<Laser> laserArray = new ArrayList<Laser>();
 	public ArrayList<Missile> missileArray = new ArrayList<Missile>();
 	//A Random instantiation used for spawning and other random things.
@@ -131,8 +132,9 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		powerupArray.clear();
 		breederArray.clear();
 		missileArray.clear();
+		powerupArray.add(new PowerupSize(300,300));
 		//XXX Temporary testing Missile
-		//		missileArray.add(new Missile(300,300));
+		//missileArray.add(new Missile(300,300));
 		//TODO Should player be RESPAWNED, or RECREATED?
 		player.respawn(gameWidth / 2, gameHeight / 2);
 
@@ -157,7 +159,6 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	}
 	//Called when player wins! Most entities are cleared, except for walls
 	public void nextLevel(){
-		System.out.println("help");
 		laserArray.clear();
 		mineArray.clear();
 		bulletArray.clear();
@@ -219,7 +220,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 				spawnWall();
 			}
 		}
-		BasicPowerup bp;
+		PowerupBasic bp;
 		for(int i = 0; i < powerupArray.size();i++){
 			bp = powerupArray.get(i);
 			bp.x -= slideSpeed;
@@ -313,7 +314,10 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void paint(Graphics g) {
 		super.paint(g);
 		Graphics2D g2 = (Graphics2D) g;
-
+		RenderingHints rh = new RenderingHints(
+	             RenderingHints.KEY_TEXT_ANTIALIASING,
+	             RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+	    g2.setRenderingHints(rh);
 		if(mapOn){
 			drawMap(g2);
 			return;
@@ -490,21 +494,41 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	//Main entity-drawing method.
 	public void drawEntities(Graphics2D g2){
 		ArrayList<Entity> tempArray = new ArrayList<Entity>();
-		tempArray.addAll(alienArray);
+		ArrayList<Entity> healthBarArray = new ArrayList<Entity>();
+		ArrayList<EntityAI> angledArray = new ArrayList<EntityAI>();
+
+
+		healthBarArray.addAll(playerArray);
+		healthBarArray.addAll(targetArray);
+		healthBarArray.addAll(breederArray);
+		healthBarArray.addAll(alienArray);
+
+		for(Entity e : healthBarArray){
+			if(!e.dead){
+				drawHealthBar(g2,e);
+			}
+		}
 		tempArray.addAll(playerArray);
 		tempArray.addAll(targetArray);
 		tempArray.addAll(breederArray);
-		for(Entity e : tempArray){
-			drawHealthBar(g2,e);
-		}
 		tempArray.addAll(mineArray);
-		tempArray.addAll(bulletArray);
 		tempArray.addAll(wallArray);
 		tempArray.addAll(powerupArray);
 		tempArray.addAll(missileArray);
 		for(Entity e : tempArray){
 			drawEntity(g2,e);
 		}
+		angledArray.addAll(alienArray);
+		angledArray.addAll(bulletArray);
+		angledArray.addAll(missileArray);
+		angledArray.addAll(targetArray);
+
+
+		for(EntityAI a: angledArray){
+			drawAngledEntity(g2, a);
+//			drawEntity(g2,a);
+		}
+
 		Line2D sword = player.getSwordLine();
 		//TODO Draw sword for camera type!!! When following player, sword drawing is way off u skrub.
 
@@ -518,23 +542,36 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void drawEntity(Graphics g,Entity e){
 		//TODO fix that goddamn null entity
 		if(e == null){
-			System.out.println("Entity sent to Game.drawEntity(Graphics, Entity) is null! Ahhhhh Fix this pls");
+			System.out.println("Entity sent to Game.drawEntity(Graphics2D, Entity) is null! Ahhhhh Fix this pls");
 			return;
 		}
-			g.setColor(e.color);
-			int x = (int) e.x;
-			int y = (int) e.y;
-			Point2D p = adjustToCamera(x,y);
-			g.fillRect((int)p.getX() - ((e.width - 1) / 2), (int)p.getY() - ((e.height - 1) / 2), 	e.width, e.height);
+		g.setColor(e.color);
+		Point2D p = adjustToCamera(e.x,e.y);
+		g.fillRect((int)p.getX() - ((e.width - 1) / 2), (int)p.getY() - ((e.height - 1) / 2), 	e.width, e.height);
+	}
+	public void drawAngledEntity(Graphics2D g2, EntityAI e){
+		if(e == null){
+			System.out.println("Entity sent to Game.drawAngledEntity(Graphics2D, Entity) is null! Ahhhhh Fix this pls");
+			return;
+		}
+		g2.setColor(e.color);
+		Point2D p = adjustToCamera(e.x,e.y);
+		Rectangle2D r = new Rectangle2D.Double(e.getCornerX(),e.getCornerY(),e.width,e.height);
+		AffineTransform transform = new AffineTransform();
+		transform.rotate(e.getDirectionAngle(), r.getX() + r.getWidth()/2, r.getY() + r.getHeight()/2);
+		Shape s = transform.createTransformedShape(r);
+		g2.fill(s);
 	}
 	//Draws a health bar below entities
 	public void drawHealthBar(Graphics g, Entity e){
-		g.setColor(e.color);
 		double health = e.health;
 		int barWidth = 35;
 		double x = e.x - (barWidth * (health / e.maxHealth)) / 2;
 		double y = e.getBottomSide() + 5;
 		Point2D p = adjustToCamera(x,y);
+		g.setColor(Color.RED);
+		g.fillRect((int)e.x - barWidth / 2, (int)p.getY(),(int) (barWidth), 3);
+		g.setColor(Color.GREEN);
 		g.fillRect((int)p.getX(), (int)p.getY(),(int) (barWidth * (health / e.maxHealth)), 3);
 	}
 	public void updateMines(){
@@ -642,6 +679,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			}
 		}
 		tempArray.addAll(enemyArray);
+		tempArray.addAll(missileArray);
 		for(Bullet cBullet : bulletArray){
 			if(!cBullet.dead){
 				for(Entity cEntity : tempArray){
@@ -657,7 +695,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 				}
 			}
 		}
-		for(BasicPowerup bP : powerupArray){
+		for(PowerupBasic bP : powerupArray){
 			for(Entity cEntity : tempArray){
 				if(!cEntity.dead){
 					if(GameMath.doCollide(cEntity,bP)){

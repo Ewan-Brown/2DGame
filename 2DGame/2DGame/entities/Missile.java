@@ -15,6 +15,7 @@ public class Missile extends EntityAI{
 	double dirAngle;
 	public Missile(double x, double y) {
 		super(x, y, Color.RED);
+		maxHealth = 1000;
 		deltaX = 0;
 		deltaY = 0;
 		width = 5;

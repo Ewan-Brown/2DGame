@@ -92,7 +92,6 @@ public class Effects {
 		for(int i = 0; i < pNum; i ++){
 			pArray.add(new ParticleBasic(x,y,speedX2 * 2 + ((rand.nextDouble() - 0.5) * offset),speedY2 * 2 + ((rand.nextDouble() - 0.5) * offset),c));
 		}
-		System.out.println(speedY2);
 		return pArray;
 	}
 	public static ArrayList<byte[]> setName(ArrayList<String> l){
