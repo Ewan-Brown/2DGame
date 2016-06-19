@@ -101,7 +101,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			System.out.println("Woops panel width is " + w + "; panel width set to 1920");
 			w = 1920;
 		}
-		
+
 		if(h > 1080){
 			System.out.println("Woops panel height is " + h + "; panel height set to 1080");
 			h = 1080;
@@ -115,7 +115,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		boundsArray.add(new Line2D.Double(gameWidth,gameHeight,0,gameHeight));
 		boundsArray.add(new Line2D.Double(0,gameHeight,0,0));
 		setBackground(Color.BLACK);
-//		startGame();
+		//		startGame();
 	}
 	//Called when game first starts, and every time a 'game-over' occurs(when player dies)
 	//Clears all entities then spawns in new ones
@@ -132,7 +132,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		breederArray.clear();
 		missileArray.clear();
 		//XXX Temporary testing Missile
-//		missileArray.add(new Missile(300,300));
+		//		missileArray.add(new Missile(300,300));
 		//TODO Should player be RESPAWNED, or RECREATED?
 		player.respawn(gameWidth / 2, gameHeight / 2);
 
@@ -157,6 +157,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	}
 	//Called when player wins! Most entities are cleared, except for walls
 	public void nextLevel(){
+		System.out.println("help");
 		laserArray.clear();
 		mineArray.clear();
 		bulletArray.clear();
@@ -267,8 +268,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	//'TICK' of the game. Called continually by the 'main loop'.
 	//Updates all Entities and then calls a repaint on the game window.
 	public void update(){
-//		slide();
-//		shrinkWalls();
+		//		slide();
+		//		shrinkWalls();
 		updateGlobalKeys();
 		updateEffects();
 		player.updateControls(keySet);
@@ -381,7 +382,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			g.setColor(e.color);
 			g.drawRect((int)(e.getCornerX() * ratioW + mapX), (int)(e.getCornerY() * ratioH + mapY), (int)(e.width * sizeRatio), (int)(e.height * sizeRatio));
 		}
-		
+
 	}
 	public void updateGlobalKeys(){
 		mapOn = keySet.get(KeyEvent.VK_T);
@@ -515,11 +516,16 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		}
 	}
 	public void drawEntity(Graphics g,Entity e){
-		g.setColor(e.color);
-		int x = (int) e.x;
-		int y = (int) e.y;
-		Point2D p = adjustToCamera(x,y);
-		g.fillRect((int)p.getX() - ((e.width - 1) / 2), (int)p.getY() - ((e.height - 1) / 2), 	e.width, e.height);
+		//TODO fix that goddamn null entity
+		if(e == null){
+			System.out.println("Entity sent to Game.drawEntity(Graphics, Entity) is null! Ahhhhh Fix this pls");
+			return;
+		}
+			g.setColor(e.color);
+			int x = (int) e.x;
+			int y = (int) e.y;
+			Point2D p = adjustToCamera(x,y);
+			g.fillRect((int)p.getX() - ((e.width - 1) / 2), (int)p.getY() - ((e.height - 1) / 2), 	e.width, e.height);
 	}
 	//Draws a health bar below entities
 	public void drawHealthBar(Graphics g, Entity e){

@@ -67,7 +67,6 @@ public class Main{
 				try {
 					settings = new Settings();
 					settings.frame.setVisible(true);
-					System.out.println(settings.done);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
