@@ -85,7 +85,7 @@ public class Main{
 		}
 		frame = new JFrame("2D Game");
 		panel = new Game();
-		settings.setData(panel, controls);
+		settings.setGameData(panel, controls);
 		frame.add(panel);
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

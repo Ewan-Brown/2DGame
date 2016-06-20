@@ -1,6 +1,7 @@
 package settings;
 
 import java.awt.EventQueue;
+import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -167,7 +168,10 @@ public class Settings {
 		frame.getContentPane().add(lblBreeders);
 		
 	}
-	public void setData(Game game,ControlSet[] controls){
+	public void setWindowData(List<String> data){
+		
+	}
+	public void setGameData(Game game,ControlSet[] controls){
 		game.aliens = Integer.parseInt(txtAliens.getText());
 		game.missiles = Integer.parseInt(txtMissiles.getText());
 		game.breeders = Integer.parseInt(txtBreeders.getText());
