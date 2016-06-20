@@ -570,7 +570,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		double y = e.getBottomSide() + 5;
 		Point2D p = adjustToCamera(x,y);
 		g.setColor(Color.RED);
-		g.fillRect((int)e.x - barWidth / 2, (int)p.getY(),(int) (barWidth), 3);
+		g.fillRect((int)e.x - barWidth / 2, (int)p.getY(),(barWidth), 3);
 		g.setColor(Color.GREEN);
 		g.fillRect((int)p.getX(), (int)p.getY(),(int) (barWidth * (health / e.maxHealth)), 3);
 	}

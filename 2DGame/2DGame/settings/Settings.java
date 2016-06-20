@@ -149,6 +149,7 @@ public class Settings {
 		btnEnter.setBounds(386, 93, 97, 25);
 		frame.getContentPane().add(btnEnter);
 		btnEnter.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e)
 		    {
 				done = true;

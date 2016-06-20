@@ -33,9 +33,7 @@ public class Main{
 	}
 	public static void updateControls() throws IOException{
 		List<String> text = TextFileReader.readFile("Controls.text");
-		w = Integer.parseInt(text.get(0));
-		h = Integer.parseInt(text.get(1));
-		int lineNum = 2;
+		int lineNum = 0;
 		int[] keys = new int[11];
 		KeyStroke stroke;
 		for(int i = 0; i < 1; i++){
@@ -63,6 +61,7 @@ public class Main{
 	}
 	public static void start(){
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					settings = new Settings();
