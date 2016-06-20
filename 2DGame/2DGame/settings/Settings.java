@@ -1,9 +1,9 @@
 package settings;
 
 import java.awt.EventQueue;
-import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
