@@ -153,7 +153,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		for(int i = 0; i < targets; i++){
 			spawnTarget();
 		}
-		turretArray.add(new Turret(200,200));
+//		spawnTurret();
+		turretArray.add(new Turret(400,400));
 		//This does not CREATE player, but instead places the player in an array that can be accessed by AI-Targetting or other such things
 		playerArray.add(player);
 	}
@@ -207,6 +208,13 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	//Method to spawn a target in a random location
 	public void spawnTarget(){
 		targetArray.add(new Target(rand.nextInt(gameWidth),rand.nextInt(gameHeight)));
+	}
+	public void spawnTurret(){
+		Turret cTurret;
+		do{
+			cTurret = new Turret(rand.nextInt(gameWidth),rand.nextInt(gameHeight));
+		}while(GameMath.getDistance(cTurret, player) < safeSpawnDistance);
+		turretArray.add(cTurret);
 	}
 	//Slides all the stationary objects(Walls/powerups) 1 unit to the left,
 	//Removes these if they exit the left side of the game.
@@ -283,6 +291,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		updateBullets();
 		updateBreeders();
 		updateMissiles();
+		updateTurrets();
 		checkCollisions();
 		checkObstacleCollisions();
 		//Checks if the game has been lost or won, and then proceeds to either game-over or next-level
@@ -522,11 +531,10 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		angledArray.addAll(bulletArray);
 		angledArray.addAll(missileArray);
 		angledArray.addAll(targetArray);
-
+		angledArray.addAll(turretArray);
 
 		for(EntityAI a: angledArray){
 			drawAngledEntity(g2, a);
-//			drawEntity(g2,a);
 		}
 
 		Line2D sword = player.getSwordLine();
@@ -627,7 +635,18 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			}
 		}
 	}
-	//Methods to add bullets and mines to the game, needed so that null things are accidentally put in because then things go BOOM :(
+	public void updateTurrets(){
+		ArrayList<Entity> tempArray = new ArrayList<Entity>();
+		tempArray.addAll(playerArray);
+		tempArray.addAll(targetArray);
+		for(Turret cTurret : turretArray){
+			if(!cTurret.dead){
+				cTurret.updateTarget(tempArray);
+				addBullets(cTurret.tryShoot());
+			}
+		}
+	}
+	//Methods to add bullets and mines to the game, needed so that null things are NOT accidentally put in, because then things go bad :(
 	public void addBullet(Bullet cBullet){
 		if(cBullet != null){
 			bulletArray.add(cBullet);
