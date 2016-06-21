@@ -11,7 +11,7 @@ import main.GameMath;
 public class Entity {
 
 	public String name;
-	public double x, y;
+	protected double x, y;
 	public int health;
 	public int maxHealth = 100;
 	public int width = 10;
@@ -120,5 +120,10 @@ public class Entity {
 	public int getCornerY(){
 		return (int) (this.y - ((this.height - 1) / 2));
 	}
+	public double getX(){return x;}
+	public double getY(){return y;}
+	public void setX(double X){x = X;}
+	public void setY(double Y){y = Y;}
+
 
 }

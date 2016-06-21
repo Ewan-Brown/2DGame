@@ -35,6 +35,7 @@ import entities.Laser;
 import entities.Missile;
 import entities.Player;
 import entities.Target;
+import entities.Turret;
 import entities.Wall;
 import entities.powerups.PowerupBasic;
 import entities.powerups.PowerupSize;
@@ -84,6 +85,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public ArrayList<PowerupBasic> powerupArray = new ArrayList<PowerupBasic>();	
 	public ArrayList<Laser> laserArray = new ArrayList<Laser>();
 	public ArrayList<Missile> missileArray = new ArrayList<Missile>();
+	public ArrayList<Turret> turretArray = new ArrayList<Turret>();
 	//A Random instantiation used for spawning and other random things.
 	//XXX should this be a method wide variable, as global use has no benefit?
 	Random rand;
@@ -133,9 +135,6 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		breederArray.clear();
 		missileArray.clear();
 		powerupArray.add(new PowerupSize(300,300));
-		//XXX Temporary testing Missile
-		//missileArray.add(new Missile(300,300));
-		//TODO Should player be RESPAWNED, or RECREATED?
 		player.respawn(gameWidth / 2, gameHeight / 2);
 
 		//Spawning the requested amount of Aliens and Walls
@@ -154,6 +153,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		for(int i = 0; i < targets; i++){
 			spawnTarget();
 		}
+		turretArray.add(new Turret(200,200));
 		//This does not CREATE player, but instead places the player in an array that can be accessed by AI-Targetting or other such things
 		playerArray.add(player);
 	}
@@ -166,6 +166,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		targetArray.clear();
 		breederArray.clear();
 		missileArray.clear();
+		turretArray.clear();
 		//Spawns requested amount of aliens
 		for(int i = 0; i < aliens; i++){
 			spawnAlien();
@@ -210,20 +211,19 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	//Slides all the stationary objects(Walls/powerups) 1 unit to the left,
 	//Removes these if they exit the left side of the game.
 	public void slide(){
-		Wall w;
 		//Separate methods needed because they need to be removed from their respected arrays.
 		for(int i = 0; i < wallArray.size(); i++){
+			Wall w;
 			w = wallArray.get(i);
-			w.x -= slideSpeed;
+			w.setX(w.getX() - slideSpeed);
 			if(w.getRightSide() < 0){
 				wallArray.remove(i);
-				spawnWall();
 			}
 		}
-		PowerupBasic bp;
 		for(int i = 0; i < powerupArray.size();i++){
+			PowerupBasic bp;
 			bp = powerupArray.get(i);
-			bp.x -= slideSpeed;
+			bp.setX(bp.getX() - slideSpeed);
 			if(bp.getRightSide() < 0){
 				powerupArray.remove(i);
 				spawnWall();
@@ -299,7 +299,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		Particle cParticle;
 		for(int i = 0; i < particleArray.size();i++){
 			cParticle = particleArray.get(i);
-			if(cParticle.x < 0 || cParticle.x > gameWidth || cParticle.y < 0 || cParticle.y > gameHeight){
+			if(cParticle.getX() < 0 || cParticle.getX() > gameWidth || cParticle.getY() < 0 || cParticle.getY() > gameHeight){
 				cParticle.dead = true;
 			}
 			if(cParticle.dead){
@@ -413,8 +413,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	}
 	public Point2D adjustToCamera(double x, double y){
 		if(cameraFollowPlayer){
-			x = (x - player.x + panelWidth / 2);
-			y = (y - player.y + panelHeight / 2);
+			x = (x - player.getX() + panelWidth / 2);
+			y = (y - player.getY() + panelHeight / 2);
 		}
 		return new Point2D.Double(x, y);
 	}
@@ -435,7 +435,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		//Goes through all walls that laser intersects, and finds the closest one
 		for(int i = 0; i < wallArray.size();i++){
 			w = wallArray.get(i);
-			r = new Rectangle2D.Double(w.x - ((w.width - 1) / 2), w.y - ((w.height - 1) / 2),w.width,w.height);
+			r = new Rectangle2D.Double(w.getX() - ((w.width - 1) / 2), w.getY() - ((w.height - 1) / 2),w.width,w.height);
 			if(line.intersects(r)){
 				if(GameMath.getDistance(player, w) < prevDist){
 					prevDist = GameMath.getDistance(player, wallArray.get(i));
@@ -485,8 +485,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		for(int i = 0; i < particleArray.size(); i++){
 			cParticle = particleArray.get(i);
 			g.setColor(cParticle.color);
-			int x = (int) cParticle.x;
-			int y = (int) cParticle.y;
+			int x = (int) cParticle.getX();
+			int y = (int) cParticle.getY();
 			p = adjustToCamera(x,y);
 			g.fillRect((int)p.getX(), (int)p.getY(), 2, 2);
 		}
@@ -546,7 +546,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			return;
 		}
 		g.setColor(e.color);
-		Point2D p = adjustToCamera(e.x,e.y);
+		Point2D p = adjustToCamera(e.getX(),e.getY());
 		g.fillRect((int)p.getX() - ((e.width - 1) / 2), (int)p.getY() - ((e.height - 1) / 2), 	e.width, e.height);
 	}
 	public void drawAngledEntity(Graphics2D g2, EntityAI e){
@@ -555,7 +555,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			return;
 		}
 		g2.setColor(e.color);
-		Point2D p = adjustToCamera(e.x,e.y);
+		Point2D p = adjustToCamera(e.getX(),e.getY());
 		Rectangle2D r = new Rectangle2D.Double(e.getCornerX(),e.getCornerY(),e.width,e.height);
 		AffineTransform transform = new AffineTransform();
 		transform.rotate(e.getDirectionAngle(), r.getX() + r.getWidth()/2, r.getY() + r.getHeight()/2);
@@ -566,11 +566,11 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 	public void drawHealthBar(Graphics g, Entity e){
 		double health = e.health;
 		int barWidth = 35;
-		double x = e.x - (barWidth * (health / e.maxHealth)) / 2;
+		double x = e.getX() - (barWidth * (health / e.maxHealth)) / 2;
 		double y = e.getBottomSide() + 5;
 		Point2D p = adjustToCamera(x,y);
 		g.setColor(Color.RED);
-		g.fillRect((int)e.x - barWidth / 2, (int)p.getY(),(barWidth), 3);
+		g.fillRect((int)e.getX() - barWidth / 2, (int)p.getY(),(barWidth), 3);
 		g.setColor(Color.GREEN);
 		g.fillRect((int)p.getX(), (int)p.getY(),(int) (barWidth * (health / e.maxHealth)), 3);
 	}
@@ -713,7 +713,7 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		if(player.dead == false && swordLine != null){
 			for(Entity cEntity : tempArray){
 				if(cEntity.dead == false){
-					tempRectangle = new Rectangle((int)cEntity.x - ((cEntity.width - 1) / 2), (int)cEntity.y - ((cEntity.height - 1) / 2),cEntity.width,cEntity.height);
+					tempRectangle = new Rectangle((int)cEntity.getX() - ((cEntity.width - 1) / 2), (int)cEntity.getY() - ((cEntity.height - 1) / 2),cEntity.width,cEntity.height);
 					if(swordLine.intersects(tempRectangle)){
 						cEntity = player.attackEntity(cEntity);
 						cEntity.onWallCollide();
@@ -747,9 +747,9 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 			tempArray.addAll(targetArray);
 			for(Entity cEntity : tempArray){
 				if(!cEntity.dead){
-					if(line.intersects(new Rectangle((int)cEntity.x - ((cEntity.width - 1) / 2), (int)cEntity.y - ((cEntity.height - 1) / 2), 	cEntity.width, cEntity.height))){
+					if(line.intersects(new Rectangle((int)cEntity.getX() - ((cEntity.width - 1) / 2), (int)cEntity.getY() - ((cEntity.height - 1) / 2), 	cEntity.width, cEntity.height))){
 						cEntity.damage(2);
-						particleArray.addAll(Effects.explode(cEntity.x, cEntity.y, Color.green, 1,4));
+						particleArray.addAll(Effects.explode(cEntity.getX(), cEntity.getY(), Color.green, 1,4));
 						if(cEntity.dead){
 							particleArray.addAll(cEntity.onDeath());
 						}
@@ -778,19 +778,19 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 				d = e.getBottomSide();
 				if(l < 0){
 					e.onWallCollide();
-					e.x = (e.width - 1) / 2;
+					e.setX((e.width - 1) / 2);
 				}
 				if(r > gameWidth){
 					e.onWallCollide();
-					e.x = gameWidth - (e.width - 1) / 2;
+					e.setX(gameWidth - (e.width - 1) / 2);
 				}
 				if(u < 0){
 					e.onWallCollide();
-					e.y = (e.height - 1) / 2;
+					e.setY((e.height - 1) / 2);
 				}
 				if(d > gameHeight){
 					e.onWallCollide();
-					e.y = gameHeight - (e.height - 1) / 2;
+					e.setY(gameHeight - (e.height - 1) / 2);
 				}
 				for(Wall w : wallArray){
 					if(GameMath.doCollide(e, w)){
@@ -810,16 +810,16 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 							}
 						}
 						if(minIndex == 0){
-							e.x = l2 - (e.width - 1) / 2 - 2;
+							e.setX(l2 - (e.width - 1) / 2 - 2);
 						}
 						if(minIndex == 1){
-							e.x = r2 + (e.width - 1) / 2 + 2;
+							e.setX(r2 + (e.width - 1) / 2 + 2);
 						}
 						if(minIndex == 2){
-							e.y = u2 - (e.height - 1) / 2 - 2;
+							e.setY(u2 - (e.height - 1) / 2 - 2);
 						}
 						if(minIndex == 3){
-							e.y = d2 + (e.height - 1) / 2 + 2;
+							e.setY(d2 + (e.height - 1) / 2 + 2);
 						}
 					}
 				}
@@ -870,8 +870,8 @@ public class Game extends JPanel implements KeyListener,MouseListener{
 		double x = p.getX();
 		double y = p.getY();
 		if(cameraFollowPlayer){
-			x = (p.getX() + (player.x - panelWidth / 2));
-			y = (p.getY() + (player.y - panelHeight / 2));
+			x = (p.getX() + (player.getX() - panelWidth / 2));
+			y = (p.getY() + (player.getY() - panelHeight / 2));
 		}
 		player.click(new Point2D.Double(x,y),e.getButton());
 	}

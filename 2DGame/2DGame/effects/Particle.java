@@ -5,7 +5,7 @@ import java.awt.Color;
 public class Particle {
 	
 	public Color color;
-	public double x,y;
+	protected double x,y;
 	double speedX,speedY;
 	int life = 1000;
 	public boolean dead = false;
@@ -19,5 +19,7 @@ public class Particle {
 	public void update(){
 		
 	}
+	public double getX(){return x;}
+	public double getY(){return y;}
 
 }

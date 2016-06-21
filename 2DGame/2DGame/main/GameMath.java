@@ -18,7 +18,7 @@ public class GameMath {
 		return getDistance(p1.getX(),p1.getY(),p2.getX(),p2.getY());
 	}
 	public static double getDistance(Entity e1, Entity e2){
-		return getDistance(e1.x,e1.y,e2.x,e2.y);
+		return getDistance(e1.getX(),e1.getY(),e2.getX(),e2.getY());
 	}
 	public static Point2D getIntersect(Line2D l1, Line2D l2){
 		double m1 = (l1.getY2() - l1.getY1()) / (l1.getX2() - l1.getX1());
@@ -52,8 +52,8 @@ public class GameMath {
 		return angle;
 	}
 	public static boolean doCollide(Entity e1, Entity e2){
-		double diffX = Math.abs(e1.x - e2.x);
-		double diffY = Math.abs(e1.y - e2.y);
+		double diffX = Math.abs(e1.getX() - e2.getX());
+		double diffY = Math.abs(e1.getY() - e2.getY());
 		if(diffX < (e1.width + e2.width) / 2 && diffY < (e1.height + e2.height) / 2){
 			return true;
 		}
